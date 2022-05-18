@@ -1,10 +1,10 @@
-package com.bonsai.p2plending;
+package com.bonsai.accountservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PeerToPeerLendingApplicationTests {
+class AccountServiceApplicationTests {
 
     @Test
     void contextLoads() {
