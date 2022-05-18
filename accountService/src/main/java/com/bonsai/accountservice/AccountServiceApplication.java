@@ -1,13 +1,13 @@
-package com.bonsai.p2plending;
+package com.bonsai.accountservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PeerToPeerLendingApplication {
+public class AccountServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PeerToPeerLendingApplication.class, args);
+        SpringApplication.run(AccountServiceApplication.class, args);
     }
 
 }
