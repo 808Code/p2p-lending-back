@@ -1,5 +1,5 @@
 package com.bonsai.accountservice.services;
 
-public interface OtpGenerateService {
+public interface OTPService {
     String generateOTP();
 }

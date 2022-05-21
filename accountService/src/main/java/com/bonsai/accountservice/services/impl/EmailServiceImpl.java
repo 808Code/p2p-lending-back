@@ -1,9 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
-import com.bonsai.accountservice.Storage.OTPList;
+import com.bonsai.accountservice.exceptions.EmailException;
 import com.bonsai.accountservice.services.EmailService;
-import com.bonsai.accountservice.services.OtpGenerateService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,20 +12,20 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender;
-    private final OtpGenerateService otpGenerateService;
-    private final OTPList otpList;
-    @Override
-    public void sendEmail(String to) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("your_email_here");
-        message.setTo(to);
-        message.setSubject("p2p lending");
-        String otp=otpGenerateService.generateOTP();
 
-        otpList.add(to,otp);
-        otpList.printContent();
-        message.setText("Your Otp ="+otp);
-        //generate
-        javaMailSender.send(message);
+    @Override
+    public void sendEmail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("system");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+
+        try {
+            javaMailSender.send(message);
+        }catch (Exception e){
+            throw new EmailException("Unable to send email");
+        }
+
     }
 }
