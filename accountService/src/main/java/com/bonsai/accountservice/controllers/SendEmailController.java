@@ -1,8 +1,11 @@
 package com.bonsai.accountservice.controllers;
 
+import com.bonsai.accountservice.dto.request.CheckEmailRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
+
+import com.bonsai.accountservice.services.CheckEmailOTPService;
 import com.bonsai.accountservice.services.EmailService;
-import com.bonsai.accountservice.services.OtpGenerateService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,14 +15,28 @@ import org.springframework.web.bind.annotation.*;
 public class SendEmailController {
 
     private final EmailService emailService;
+    private final CheckEmailOTPService checkEmailOTPService;
 
 
     @PostMapping("/sendEmailOTP")
     public String sendEmailOTP(@RequestBody SendEmailRequest request){
         emailService.sendEmail(request.email());
 
-        return "email has been sent";
+        return "An Otp has been Sent";
     }
+
+    @PostMapping("/verifyEmailOTP")
+    public String verifyEmailOTP(@RequestBody CheckEmailRequest request){
+        if(checkEmailOTPService.checkEmailOTP(request.email(), request.otp())){
+            checkEmailOTPService.removeOTP(request.email());
+            return "OTP Verified";
+        }
+
+        return "Wrong OTP";
+    }
+
+
+
 
 
 }
