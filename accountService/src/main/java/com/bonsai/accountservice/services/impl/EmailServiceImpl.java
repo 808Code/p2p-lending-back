@@ -19,7 +19,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmail(String to) {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("your_email_here");
+        message.setFrom("finderprojeckt@gmail.com");
         message.setTo(to);
         message.setSubject("p2p lending");
         String otp=otpGenerateService.generateOTP();
