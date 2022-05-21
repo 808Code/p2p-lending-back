@@ -2,6 +2,7 @@ package com.bonsai.accountservice.controllers;
 
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 import com.bonsai.accountservice.services.EmailService;
+import com.bonsai.accountservice.services.OtpGenerateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
