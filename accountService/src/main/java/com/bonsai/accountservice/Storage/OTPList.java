@@ -19,7 +19,16 @@ public class OTPList {
     public void remove(String email){
         otpList.remove(email);
     }
+
+    public boolean checkKey(String email){
+        return otpList.containsKey(email);
+    }
+    public String getValue(String email){
+        return otpList.get(email);
+    }
+
     public void printContent(){
+        System.out.println("__________The OTP List________");
         for (Map.Entry<String, String> entry : otpList.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
