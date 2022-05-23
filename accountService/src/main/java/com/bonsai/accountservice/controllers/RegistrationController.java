@@ -1,5 +1,6 @@
 package com.bonsai.accountservice.controllers;
 
+import com.bonsai.accountservice.dto.request.CreateBorrowerRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 
@@ -31,9 +32,17 @@ public class RegistrationController {
        registrationService.verifyEmailOTP(request.email(), request.otp());
 
        return ResponseEntity.ok(
-               new SuccessResponse("OTP verified", true)
+               new SuccessResponse("otpCode verified", true)
        );
 
+    }
+
+    @PostMapping("/createBorrower")
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateBorrowerRequest request){
+        registrationService.saveEmailPassword(request);
+        return ResponseEntity.ok(
+                new SuccessResponse("Account Created", true)
+        );
     }
 
 
