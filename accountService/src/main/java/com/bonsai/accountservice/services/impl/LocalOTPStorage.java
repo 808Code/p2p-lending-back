@@ -23,8 +23,8 @@ public class LocalOTPStorage implements OTPStorage {
 
     @Override
     public void delete(String email) {
+        log.info("Deleted {}", store);
         store.remove(email);
-        log.info("Store {}", store);
     }
 
     @Override

@@ -29,7 +29,7 @@ public class RegistrationController {
 
     @PostMapping("/verifyEmailOTP")
     public ResponseEntity<SuccessResponse> verifyEmailOTP(@RequestBody VerifyOTPRequest request){
-       registrationService.verifyEmailOTP(request.email(), request.otp());
+       registrationService.verifyEmailOTP(request);
 
        return ResponseEntity.ok(
                new SuccessResponse("otpCode verified", true)

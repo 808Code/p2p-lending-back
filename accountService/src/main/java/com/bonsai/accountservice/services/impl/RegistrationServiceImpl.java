@@ -1,6 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.dto.request.CreateBorrowerRequest;
+import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
 import com.bonsai.accountservice.exceptions.InvalidOTPException;
 import com.bonsai.accountservice.models.UserCredential;
@@ -37,25 +38,38 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void verifyEmailOTP(String email,String otpCode) {
+    public void verifyEmailOTP(VerifyOTPRequest request) {
+        String email=request.email();
         OTP otpCodeWithVerification = otpStorage.getOtp(email);
+
+        if(otpCodeWithVerification == null){
+            throw new InvalidOTPException("Receive an OTP code first.");
+        }
+
         String storedOtp= otpCodeWithVerification.getOtpCode();
-        if(storedOtp == null || !storedOtp.equals(otpCode)){
+        if(storedOtp == null || !storedOtp.equals(request.otp())){
             throw new InvalidOTPException("otpCode not verified");
         }
-//        otpStorage.delete(email);
         otpCodeWithVerification.setVerification(true);
-        log.info("Changed email {}{}=",email,otpCodeWithVerification );
+        log.info("Changed email {} {}",email,otpCodeWithVerification );
 
     }
 
     @Override
     public void saveEmailPassword(CreateBorrowerRequest request) {
+
+        String email=request.email();
+        OTP otpCodeWithVerification = otpStorage.getOtp(email);
+
+        if(otpCodeWithVerification==null || !otpCodeWithVerification.getVerification()){
+            throw new InvalidOTPException("otpCode not verified");
+        }
         userCredentialRepo.save(
                 UserCredential.builder()
                 .email(request.email())
                 .password(request.password())
                 .build()
         );
+        otpStorage.delete(email);
     }
 }
