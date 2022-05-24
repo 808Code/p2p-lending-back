@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.controllers;
 
-import com.bonsai.accountservice.dto.request.CreateBorrowerRequest;
+import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 
@@ -38,10 +38,18 @@ public class RegistrationController {
     }
 
     @PostMapping("/createBorrower")
-    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateBorrowerRequest request){
-        registrationService.saveEmailPassword(request);
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateUserRequest request){
+        registrationService.saveEmailPassword(request,"borrower");
         return ResponseEntity.ok(
-                new SuccessResponse("Account Created", true)
+                new SuccessResponse("Account Created as Borrower.", true)
+        );
+    }
+
+    @PostMapping("/createInvestor")
+    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody CreateUserRequest request){
+        registrationService.saveEmailPassword(request,"investor");
+        return ResponseEntity.ok(
+                new SuccessResponse("Account Created as Investor.", true)
         );
     }
 

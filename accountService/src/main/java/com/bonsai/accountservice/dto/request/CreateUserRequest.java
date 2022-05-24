@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.dto.request;
 
-public record CreateBorrowerRequest (
+public record CreateUserRequest (
         String email,
         String password
 ){}
