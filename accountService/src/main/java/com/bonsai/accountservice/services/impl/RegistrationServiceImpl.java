@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.services.impl;
 
-import com.bonsai.accountservice.dto.request.CreateBorrowerRequest;
+import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
 import com.bonsai.accountservice.exceptions.InvalidOTPException;
@@ -56,20 +56,26 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void saveEmailPassword(CreateBorrowerRequest request) {
+    public void saveEmailPassword(CreateUserRequest request,String role) {
+        String email = request.email();
 
-        String email=request.email();
+        if(userCredentialRepo.findByEmail(email).isPresent()){
+            throw new InvalidOTPException("Email Already Registered.");
+        }
         OTP otpCodeWithVerification = otpStorage.getOtp(email);
-
-        if(otpCodeWithVerification==null || !otpCodeWithVerification.getVerification()){
+        if (otpCodeWithVerification == null || !otpCodeWithVerification.getVerification()) {
             throw new InvalidOTPException("otpCode not verified");
         }
         userCredentialRepo.save(
                 UserCredential.builder()
-                .email(request.email())
-                .password(request.password())
-                .build()
+                        .email(request.email())
+                        .password(request.password())
+                        .role(role)
+                        .build()
         );
         otpStorage.delete(email);
+
+
+
     }
 }
