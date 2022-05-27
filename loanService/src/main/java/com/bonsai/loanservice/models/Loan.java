@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -41,12 +41,12 @@ public class Loan {
     private Boolean approvalStatus;
 
     @Column(name = "starting_date")
-    private Date startingDate;
+    private LocalDate startingDate;
 
     private Integer duration;
 
     @Column(name = "ending_date")
-    private Date endingDate;
+    private LocalDate endingDate;
 
     @Column(name = "loan_type")
     private String loanType;

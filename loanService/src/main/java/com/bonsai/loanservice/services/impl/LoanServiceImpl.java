@@ -3,7 +3,6 @@ package com.bonsai.loanservice.services.impl;
 import com.bonsai.accountservice.exceptions.AppException;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
-import com.bonsai.loanservice.components.DateService;
 import com.bonsai.loanservice.dto.LoanDto;
 import com.bonsai.loanservice.models.Loan;
 import com.bonsai.loanservice.repositories.LoanRepo;
@@ -39,10 +38,10 @@ public class LoanServiceImpl implements LoanService {
                 .borrower(borrower)
                 .startingDate(loanDto.startingDate())
                 .duration(loanDto.duration())
+                .endingDate(loanDto.startingDate().plusMonths(loanDto.duration()))
                 .amount(loanDto.amount())
                 .loanType(loanDto.loanType())
                 .build();
-        loan.setEndingDate(DateService.findEndingDate(loan.getStartingDate(), loan.getDuration()));
         if (loanDto.approvalStatus() == null || !loanDto.approvalStatus()) {
             loan.setApprovalStatus(false);
         } else {
