@@ -6,6 +6,7 @@ import com.bonsai.accountservice.dto.request.SendEmailRequest;
 
 import com.bonsai.accountservice.dto.response.SuccessResponse;
 
+import com.bonsai.accountservice.models.Roles;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class RegistrationController {
 
     @PostMapping("/createBorrower")
     public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateUserRequest request){
-        registrationService.saveEmailPassword(request,"borrower");
+        registrationService.saveEmailPassword(request, Roles.BORROWER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Borrower.", true)
         );
@@ -47,7 +48,7 @@ public class RegistrationController {
 
     @PostMapping("/createInvestor")
     public ResponseEntity<SuccessResponse> createInvestor(@RequestBody CreateUserRequest request){
-        registrationService.saveEmailPassword(request,"investor");
+        registrationService.saveEmailPassword(request,Roles.INVESTOR);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Investor.", true)
         );
