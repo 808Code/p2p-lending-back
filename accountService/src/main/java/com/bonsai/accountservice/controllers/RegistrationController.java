@@ -1,10 +1,12 @@
 package com.bonsai.accountservice.controllers;
 
+import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 
 import com.bonsai.accountservice.dto.response.SuccessResponse;
 
+import com.bonsai.accountservice.models.Roles;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +30,28 @@ public class RegistrationController {
 
     @PostMapping("/verifyEmailOTP")
     public ResponseEntity<SuccessResponse> verifyEmailOTP(@RequestBody VerifyOTPRequest request){
-       registrationService.verifyEmailOTP(request.email(), request.otp());
+       registrationService.verifyEmailOTP(request);
 
        return ResponseEntity.ok(
-               new SuccessResponse("OTP verified", true)
+               new SuccessResponse("otpCode verified", true)
        );
 
+    }
+
+    @PostMapping("/createBorrower")
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateUserRequest request){
+        registrationService.saveEmailPassword(request, Roles.BORROWER);
+        return ResponseEntity.ok(
+                new SuccessResponse("Account Created as Borrower.", true)
+        );
+    }
+
+    @PostMapping("/createInvestor")
+    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody CreateUserRequest request){
+        registrationService.saveEmailPassword(request,Roles.INVESTOR);
+        return ResponseEntity.ok(
+                new SuccessResponse("Account Created as Investor.", true)
+        );
     }
 
 
