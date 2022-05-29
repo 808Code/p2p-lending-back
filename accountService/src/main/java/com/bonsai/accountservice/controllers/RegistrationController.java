@@ -6,7 +6,7 @@ import com.bonsai.accountservice.dto.request.SendEmailRequest;
 
 import com.bonsai.accountservice.dto.response.SuccessResponse;
 
-import com.bonsai.accountservice.models.Roles;
+import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
