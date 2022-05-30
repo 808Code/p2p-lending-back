@@ -29,6 +29,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.bonsai</groupId>
+            <artifactId>accountService</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>import</scope>
+        </dependency>
     </dependencies>
 
     <build>
