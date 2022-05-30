@@ -36,17 +36,13 @@ public class LoanServiceImpl implements LoanService {
         Loan loan = Loan.builder()
                 .id(loanDto.id())
                 .borrower(borrower)
-                .startingDate(loanDto.startingDate())
+                .requestedDate(loanDto.requestedDate())
                 .duration(loanDto.duration())
-                .endingDate(loanDto.startingDate().plusMonths(loanDto.duration()))
+                .deadline(loanDto.requestedDate().plusMonths(loanDto.duration()))
                 .amount(loanDto.amount())
                 .loanType(loanDto.loanType())
+                .approvalStatus(false)
                 .build();
-        if (loanDto.approvalStatus() == null || !loanDto.approvalStatus()) {
-            loan.setApprovalStatus(false);
-        } else {
-            loan.setApprovalStatus(true);
-        }
         return new LoanDto(loanRepo.save(loan));
     }
 

@@ -21,12 +21,7 @@ import java.util.UUID;
 @Builder
 public class Loan {
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(
-            name = "UUID",
-            strategy = "org.hibernate.id.UUIDGenerator"
-    )
-    @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne
@@ -40,13 +35,12 @@ public class Loan {
     @Column(name = "approval_status")
     private Boolean approvalStatus;
 
-    @Column(name = "starting_date")
-    private LocalDate startingDate;
+    @Column(name = "requested_date")
+    private LocalDate requestedDate;
 
     private Integer duration;
 
-    @Column(name = "ending_date")
-    private LocalDate endingDate;
+    private LocalDate deadline;
 
     @Column(name = "loan_type")
     private String loanType;

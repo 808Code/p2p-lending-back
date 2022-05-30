@@ -1,6 +1,5 @@
 package com.bonsai.loanservice.controllers;
 
-import com.bonsai.accountservice.dto.response.ErrorResponse;
 import com.bonsai.accountservice.dto.response.SuccessResponse;
 import com.bonsai.accountservice.exceptions.AppException;
 import com.bonsai.loanservice.dto.LoanDto;

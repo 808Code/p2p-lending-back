@@ -8,9 +8,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Narendra
@@ -29,7 +29,7 @@ public record LoanDto(
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         @FutureOrPresent(message = "Past date not supported")
-        LocalDate startingDate,
+        LocalDate requestedDate,
 
         @NotNull(message = "Loan duration can't be null")
         @Min(value = 1, message = "Loan duration must be at-least 1 month")
@@ -37,7 +37,7 @@ public record LoanDto(
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         @FutureOrPresent(message = "Past date not supported")
-        LocalDate endingDate,
+        LocalDate deadline,
 
         @NotEmpty(message = "Loan type can't be empty")
         String loanType,
@@ -46,16 +46,14 @@ public record LoanDto(
 ) {
 
     public LoanDto(Loan loan) {
-        this(loan.getId(), loan.getBorrower().getId(), loan.getAmount(), loan.getStartingDate(),
-                loan.getDuration(), loan.getEndingDate(), loan.getLoanType(), loan.getApprovalStatus());
+        this(loan.getId(), loan.getBorrower().getId(), loan.getAmount(), loan.getRequestedDate(),
+                loan.getDuration(), loan.getDeadline(), loan.getLoanType(), loan.getApprovalStatus());
     }
 
     public static List<LoanDto> loanToDtoList(List<Loan> loanList) {
-        List<LoanDto> loanDtoList = new ArrayList<>();
-        for (Loan loan : loanList) {
-            loanDtoList.add(new LoanDto(loan));
-        }
-        return loanDtoList;
+        return loanList.stream().map(
+                loan -> new LoanDto(loan)
+        ).collect(Collectors.toList());
     }
 
 }
