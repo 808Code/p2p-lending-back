@@ -2,7 +2,6 @@ package com.bonsai.loanservice.models;
 
 import com.bonsai.accountservice.models.UserCredential;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -39,8 +38,6 @@ public class Loan {
     private LocalDate requestedDate;
 
     private Integer duration;
-
-    private LocalDate deadline;
 
     @Column(name = "loan_type")
     private String loanType;

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -36,9 +37,8 @@ public class LoanServiceImpl implements LoanService {
         Loan loan = Loan.builder()
                 .id(loanDto.id())
                 .borrower(borrower)
-                .requestedDate(loanDto.requestedDate())
+                .requestedDate(LocalDate.now())
                 .duration(loanDto.duration())
-                .deadline(loanDto.requestedDate().plusMonths(loanDto.duration()))
                 .amount(loanDto.amount())
                 .loanType(loanDto.loanType())
                 .approvalStatus(false)

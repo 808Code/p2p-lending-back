@@ -35,10 +35,6 @@ public record LoanDto(
         @Min(value = 1, message = "Loan duration must be at-least 1 month")
         Integer duration,
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        @FutureOrPresent(message = "Past date not supported")
-        LocalDate deadline,
-
         @NotEmpty(message = "Loan type can't be empty")
         String loanType,
 
@@ -47,7 +43,7 @@ public record LoanDto(
 
     public LoanDto(Loan loan) {
         this(loan.getId(), loan.getBorrower().getId(), loan.getAmount(), loan.getRequestedDate(),
-                loan.getDuration(), loan.getDeadline(), loan.getLoanType(), loan.getApprovalStatus());
+                loan.getDuration(), loan.getLoanType(), loan.getApprovalStatus());
     }
 
     public static List<LoanDto> loanToDtoList(List<Loan> loanList) {
