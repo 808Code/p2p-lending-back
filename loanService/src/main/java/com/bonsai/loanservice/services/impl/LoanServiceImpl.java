@@ -3,9 +3,9 @@ package com.bonsai.loanservice.services.impl;
 import com.bonsai.accountservice.exceptions.AppException;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
-import com.bonsai.loanservice.dto.LoanDto;
-import com.bonsai.loanservice.models.Loan;
-import com.bonsai.loanservice.repositories.LoanRepo;
+import com.bonsai.loanservice.dto.LoanRequestDto;
+import com.bonsai.loanservice.models.LoanRequest;
+import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LoanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,31 +24,31 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LoanServiceImpl implements LoanService {
 
-    private final LoanRepo loanRepo;
+    private final LoanRequestRepo loanRequestRepo;
 
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public LoanDto save(LoanDto loanDto) throws ParseException {
+    public LoanRequestDto save(LoanRequestDto loanRequestDto) throws ParseException {
 
-        UserCredential borrower = userCredentialRepo.findById(loanDto.borrowerId()).orElseThrow(
+        UserCredential borrower = userCredentialRepo.findById(loanRequestDto.borrowerId()).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
-        Loan loan = Loan.builder()
-                .id(loanDto.id())
+        LoanRequest loanRequest = LoanRequest.builder()
+                .id(loanRequestDto.id())
                 .borrower(borrower)
                 .requestedDate(LocalDate.now())
-                .duration(loanDto.duration())
-                .amount(loanDto.amount())
-                .loanType(loanDto.loanType())
+                .duration(loanRequestDto.duration())
+                .amount(loanRequestDto.amount())
+                .loanType(loanRequestDto.loanType())
                 .approvalStatus(false)
                 .build();
-        return new LoanDto(loanRepo.save(loan));
+        return new LoanRequestDto(loanRequestRepo.save(loanRequest));
     }
 
     @Override
-    public LoanDto findById(UUID id) {
-        Loan loan = loanRepo.findById(id).orElseThrow(() -> new AppException("Loan not found", HttpStatus.BAD_REQUEST));
-        return new LoanDto(loan);
+    public LoanRequestDto findById(UUID id) {
+        LoanRequest loanRequest = loanRequestRepo.findById(id).orElseThrow(() -> new AppException("Loan not found", HttpStatus.BAD_REQUEST));
+        return new LoanRequestDto(loanRequest);
     }
 }

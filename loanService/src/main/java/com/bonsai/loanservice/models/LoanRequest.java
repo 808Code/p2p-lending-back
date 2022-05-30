@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Loan {
+public class LoanRequest {
     @Id
     @GeneratedValue
     private UUID id;

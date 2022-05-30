@@ -1,9 +1,8 @@
 package com.bonsai.loanservice.services;
 
-import com.bonsai.loanservice.dto.LoanDto;
+import com.bonsai.loanservice.dto.LoanRequestDto;
 
 import java.text.ParseException;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -12,6 +11,6 @@ import java.util.UUID;
  * @since 2022-05-25
  */
 public interface LoanService {
-    LoanDto save(LoanDto loanDto) throws ParseException;
-    LoanDto findById(UUID id);
+    LoanRequestDto save(LoanRequestDto loanRequestDto) throws ParseException;
+    LoanRequestDto findById(UUID id);
 }

@@ -1,6 +1,6 @@
 package com.bonsai.loanservice.dto;
 
-import com.bonsai.loanservice.models.Loan;
+import com.bonsai.loanservice.models.LoanRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.validation.constraints.FutureOrPresent;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2022-05-25
  */
-public record LoanDto(
+public record LoanRequestDto(
         UUID id,
 
         @NotNull(message = "Borrower id can't be null")
@@ -41,14 +41,14 @@ public record LoanDto(
         Boolean approvalStatus
 ) {
 
-    public LoanDto(Loan loan) {
-        this(loan.getId(), loan.getBorrower().getId(), loan.getAmount(), loan.getRequestedDate(),
-                loan.getDuration(), loan.getLoanType(), loan.getApprovalStatus());
+    public LoanRequestDto(LoanRequest loanRequest) {
+        this(loanRequest.getId(), loanRequest.getBorrower().getId(), loanRequest.getAmount(), loanRequest.getRequestedDate(),
+                loanRequest.getDuration(), loanRequest.getLoanType(), loanRequest.getApprovalStatus());
     }
 
-    public static List<LoanDto> loanToDtoList(List<Loan> loanList) {
+    public static List<LoanRequestDto> loanToDtoList(List<LoanRequest> loanList) {
         return loanList.stream().map(
-                loan -> new LoanDto(loan)
+                loanRequest -> new LoanRequestDto(loanRequest)
         ).collect(Collectors.toList());
     }
 
