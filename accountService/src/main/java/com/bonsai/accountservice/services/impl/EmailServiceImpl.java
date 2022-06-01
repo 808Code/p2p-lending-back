@@ -1,7 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
-import com.bonsai.accountservice.exceptions.EmailException;
 import com.bonsai.accountservice.services.EmailService;
+import com.bonsai.sharedservice.exceptions.EmailException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

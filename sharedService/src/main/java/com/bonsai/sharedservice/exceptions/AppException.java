@@ -1,4 +1,4 @@
-package com.bonsai.accountservice.exceptions;
+package com.bonsai.sharedservice.exceptions;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

@@ -1,12 +1,12 @@
 package com.bonsai.loanservice.services.impl;
 
-import com.bonsai.accountservice.exceptions.AppException;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LoanService;
+import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
