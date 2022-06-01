@@ -1,4 +1,4 @@
-package com.example.config;
+package com.bonsai.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
