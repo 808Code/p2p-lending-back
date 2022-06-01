@@ -1,9 +1,9 @@
 package com.bonsai.loanservice.controllers;
 
-import com.bonsai.accountservice.dto.response.SuccessResponse;
-import com.bonsai.accountservice.exceptions.AppException;
+import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.services.LoanService;
+import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

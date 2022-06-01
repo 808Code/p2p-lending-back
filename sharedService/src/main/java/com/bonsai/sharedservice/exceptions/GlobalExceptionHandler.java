@@ -1,6 +1,6 @@
-package com.bonsai.accountservice.exceptions;
+package com.bonsai.sharedservice.exceptions;
 
-import com.bonsai.accountservice.dto.response.ErrorResponse;
+import com.bonsai.sharedservice.dtos.response.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
