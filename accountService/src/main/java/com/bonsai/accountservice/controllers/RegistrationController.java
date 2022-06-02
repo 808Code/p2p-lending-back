@@ -53,9 +53,4 @@ public class RegistrationController {
                 new SuccessResponse("Account Created as Investor.", true)
         );
     }
-
-
-
-
-
 }
