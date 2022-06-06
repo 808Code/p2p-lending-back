@@ -9,4 +9,5 @@ public interface RegistrationService {
     void verifyEmailOTP(VerifyOTPRequest request);
     void saveEmailPassword(CreateUserRequest request,String role);
     void saveKYC(RegisterKYCRequest request);
+
 }
