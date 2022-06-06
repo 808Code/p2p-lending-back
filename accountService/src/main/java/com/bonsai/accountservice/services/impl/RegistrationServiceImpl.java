@@ -1,14 +1,13 @@
 package com.bonsai.accountservice.services.impl;
 
 
+import com.bonsai.accountservice.constants.FileCategory;
 import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
 import com.bonsai.accountservice.exceptions.InvalidOTPException;
 import com.bonsai.accountservice.models.*;
-import com.bonsai.accountservice.repositories.ContactRepo;
-import com.bonsai.accountservice.repositories.FinanceRepo;
 import com.bonsai.accountservice.repositories.KYCRepo;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.*;
@@ -16,13 +15,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Optional;
+
 
 @Service
 @Slf4j
@@ -35,9 +33,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserCredentialRepo userCredentialRepo;
     private final KYCRepo kycRepo;
     private final StorageService storageService;
-    private final ContactRepo contactRepo;
-    private final FinanceRepo financeRepo;
     private final ObjectMapper objectMapper;
+    private final StorageName storageName;
     private Contact contact;
     private Finance finance;
     private Address permanentAddress;
@@ -103,10 +100,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void saveKYC(RegisterKYCRequest request) {
         log.info("Request = {}",request);
 
-        String firstName=request.firstName();
-        String lastName=request.lastName();
-        String citizenShipNumber=request.citizenShipNumber();
-        MultipartFile file=request.profilePhoto();
+
+        MultipartFile profilePhotoFile=request.profilePhoto();
+        MultipartFile citizenShipPhotoFrontFile=request.citizenShipPhotoFront();
+        MultipartFile citizenShipPhotoBackFile=request.citizenShipPhotoBack();
+
+        String profilePhotoFileStorageName=storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
+        String citizenShipPhotoFrontFileStorageName=storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(),FileCategory.CITIZENSHIP_FRONT);
+        String citizenShipPhotoBackFileStorageName=storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(),FileCategory.CITIZENSHIP_BACK);
 
         //here needs better exception handling
         try {
@@ -115,20 +116,19 @@ public class RegistrationServiceImpl implements RegistrationService {
             permanentAddress=objectMapper.readValue(request.permanentAddress(),Address.class);
             temporaryAddress=objectMapper.readValue(request.temporaryAddress(),Address.class);
         } catch (JsonProcessingException e) {
+            //what app exception for and error code?
+            //or new but string so can use an toher string
             e.printStackTrace();
         }
 
-        String userId="5";//do i get it from below build
 
-        String fileName=file.getOriginalFilename();
-        String currentDate = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        String storageName = fileName.replace(fileName, FilenameUtils.getBaseName(fileName).concat(currentDate) + userId + "." + FilenameUtils.getExtension(fileName));
+
 
         KYC kyc=KYC.builder()
-                .firstName(firstName)
-                .lastName(lastName)
+                .firstName(request.firstName())
+                .lastName(request.lastName())
                 .middleName(request.middleName())
-                .citizenShipNumber(citizenShipNumber)
+                .citizenShipNumber(request.citizenShipNumber())
                 .dob(LocalDate.parse(request.dob()))
                 .maritalStatus(request.maritalStatus())
                 .children(Boolean.parseBoolean(request.children()))
@@ -138,13 +138,29 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .contact(contact)
                 .permanentAddress(permanentAddress.toString())
                 .temporaryAddress(temporaryAddress.toString())
+                .profilePhoto(profilePhotoFileStorageName)
+                .citizenShipPhotoFront(citizenShipPhotoFrontFileStorageName)
+                .citizenShipPhotoBack(citizenShipPhotoBackFileStorageName)
                 .build();
 
-        kycRepo.save(kyc);
-        finance.setKyc(kyc);
-        financeRepo.save(finance);
 
-        storageService.store(file,storageName);
+        kycRepo.save(kyc);
+
+        Optional<UserCredential> optionalUserCredential=userCredentialRepo.findByEmail(request.email());
+//        if(!optionalDepartment.isPresent()){
+//            throw new ResourceNotFound
+//        }
+//
+        UserCredential userCredential = optionalUserCredential.get();
+        userCredential.setKyc(kyc);
+        userCredentialRepo.save(userCredential);
+
+//        finance.setKyc(kyc);
+//        financeRepo.save(finance);
+
+        storageService.store(profilePhotoFile,profilePhotoFileStorageName);
+        storageService.store(citizenShipPhotoFrontFile,citizenShipPhotoFrontFileStorageName);
+        storageService.store(citizenShipPhotoBackFile,citizenShipPhotoBackFileStorageName);
 
 
 
