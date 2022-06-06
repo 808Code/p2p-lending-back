@@ -34,7 +34,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final KYCRepo kycRepo;
     private final StorageService storageService;
     private final ObjectMapper objectMapper;
-    private final StorageName storageName;
+    private final StorageNameService storageName;
     private Contact contact;
     private Finance finance;
     private Address permanentAddress;
