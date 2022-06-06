@@ -29,7 +29,7 @@ public class  Contact{
     String secondaryMobile;
 
 
-//    @OneToOne(mappedBy = "contact")
-//    private KYC kyc;
+    @OneToOne(mappedBy = "contact")
+    private KYC kyc;
 
 }
