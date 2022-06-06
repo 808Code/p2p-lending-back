@@ -6,6 +6,7 @@ import com.bonsai.accountservice.models.Finance;
 import org.springframework.web.multipart.MultipartFile;
 
 public record RegisterKYCRequest(
+        String email,
         String firstName,
         String middleName,
         String lastName,
