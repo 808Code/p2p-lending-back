@@ -1,15 +1,13 @@
 package com.bonsai.accountservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Builder
-@Data
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +15,6 @@ public class  Contact{
     @Id
     @GeneratedValue
     private UUID id;
-
 
     String otherEmail;
 
@@ -27,9 +24,5 @@ public class  Contact{
     String primaryMobile;
 
     String secondaryMobile;
-
-
-    @OneToOne(mappedBy = "contact")
-    private KYC kyc;
 
 }
