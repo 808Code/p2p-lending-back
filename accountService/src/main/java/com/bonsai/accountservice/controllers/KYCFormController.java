@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Slf4j
 public class KYCFormController {
     private final RegistrationService registrationService;
-    private final KYCService kycService;
-
 
     @PostMapping("/registerKYC")
     public ResponseEntity<SuccessResponse> registerKYC(@ModelAttribute RegisterKYCRequest request){
