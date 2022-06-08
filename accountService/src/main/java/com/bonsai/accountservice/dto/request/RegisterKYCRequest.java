@@ -1,8 +1,6 @@
 package com.bonsai.accountservice.dto.request;
 
-import com.bonsai.accountservice.models.Address;
-import com.bonsai.accountservice.models.Contact;
-import com.bonsai.accountservice.models.Finance;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public record RegisterKYCRequest(
