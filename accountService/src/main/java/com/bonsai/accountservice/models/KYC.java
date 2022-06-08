@@ -1,9 +1,7 @@
 package com.bonsai.accountservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -12,7 +10,8 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class KYC {
 
     @Id
@@ -75,8 +74,6 @@ public class KYC {
 
     @Column
     private String  citizenShipPhotoBack;
-
-
 
 }
 
