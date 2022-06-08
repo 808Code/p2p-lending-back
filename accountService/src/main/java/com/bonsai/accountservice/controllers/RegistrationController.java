@@ -1,10 +1,9 @@
 package com.bonsai.accountservice.controllers;
 
 import com.bonsai.accountservice.dto.request.*;
-
 import com.bonsai.accountservice.dto.response.SuccessResponse;
-
 import com.bonsai.accountservice.constants.Roles;
+import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ public class RegistrationController {
     @PostMapping("/sendEmailOTP")
     public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request){
         registrationService.sendEmailOTP(request.email());
-
         return ResponseEntity.ok(
                 new SuccessResponse("An Otp has been Sent", true)
         );
@@ -33,7 +31,6 @@ public class RegistrationController {
     @PostMapping("/verifyEmailOTP")
     public ResponseEntity<SuccessResponse> verifyEmailOTP(@RequestBody VerifyOTPRequest request){
        registrationService.verifyEmailOTP(request);
-
        return ResponseEntity.ok(
                new SuccessResponse("otpCode verified", true)
        );
@@ -42,7 +39,6 @@ public class RegistrationController {
 
     @PostMapping("/createBorrower")
     public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateUserRequest request){
-        log.info("Entered");
         registrationService.saveEmailPassword(request, Roles.BORROWER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Borrower.", true)
@@ -59,20 +55,18 @@ public class RegistrationController {
 
 
     @PostMapping("/verifyKYC")
-    public ResponseEntity<SuccessResponse> registerKYC(@RequestBody VerifyKYCRequest request){
+    public ResponseEntity<SuccessResponse> verifyKYC(@RequestBody VerifyKYCRequest request){
         kycService.verifyKYC(request);
-
         return ResponseEntity.ok(
                 new SuccessResponse("KYC verified.",true)
         );
     }
 
     @PostMapping("/getKYC")
-    public ResponseEntity<SuccessResponse> registerKYC(@RequestBody GetKYCRequest request){
-        kycService.getKYC(request);
-
+    public ResponseEntity<SuccessResponse> getKYC(@RequestBody GetKYCRequest request){
+        KYC kyc = kycService.getKYC(request);
         return ResponseEntity.ok(
-                new SuccessResponse("KYC verified.",true)
+                new SuccessResponse("KYC for "+request.email(),kyc)
         );
     }
 
