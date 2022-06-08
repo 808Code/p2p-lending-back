@@ -1,16 +1,14 @@
 package com.bonsai.accountservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 
 @Builder
-@Data
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -40,7 +38,4 @@ public class Finance {
     @Column(nullable = false)
     String monthlySavings;
 
-    @OneToOne(mappedBy = "finance")
-    private KYC kyc;
-
-    }
+}
