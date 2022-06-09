@@ -8,7 +8,6 @@ import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
-import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
