@@ -1,5 +1,10 @@
 package com.bonsai.accountservice.controllers;
 
+import com.bonsai.accountservice.dto.request.*;
+import com.bonsai.accountservice.dto.response.SuccessResponse;
+import com.bonsai.accountservice.constants.Roles;
+import com.bonsai.accountservice.models.KYC;
+import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
@@ -9,15 +14,18 @@ import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.accountservice.models.Roles;
 import com.bonsai.accountservice.services.RegistrationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
+    private final KYCService kycService;
 
     @PostMapping("/sendEmailOTP")
     public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request){
@@ -55,7 +63,21 @@ public class RegistrationController {
     }
 
 
+    @PostMapping("/verifyKYC")
+    public ResponseEntity<SuccessResponse> verifyKYC(@RequestBody VerifyKYCRequest request){
+        kycService.verifyKYC(request);
+        return ResponseEntity.ok(
+                new SuccessResponse("KYC verified.",true)
+        );
+    }
 
+    @PostMapping("/getKYC")
+    public ResponseEntity<SuccessResponse> getKYC(@RequestBody GetKYCRequest request){
+        KYC kyc = kycService.getKYC(request);
+        return ResponseEntity.ok(
+                new SuccessResponse("KYC for "+request.email(),kyc)
+        );
+    }
 
 
 }

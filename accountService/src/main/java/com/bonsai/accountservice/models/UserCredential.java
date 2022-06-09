@@ -1,19 +1,14 @@
 package com.bonsai.accountservice.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Builder
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCredential {
@@ -29,4 +24,12 @@ public class UserCredential {
 
     @Column(nullable = false)
     private String role;
+
+
+    @Column(nullable = false)
+    private boolean kycVerified=false;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "kyc_id", referencedColumnName = "id")
+    private KYC kyc;
 }

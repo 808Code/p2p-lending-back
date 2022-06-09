@@ -1,18 +1,33 @@
 package com.bonsai.accountservice.services.impl;
 
+import com.bonsai.accountservice.constants.FileCategory;
 import com.bonsai.accountservice.dto.request.CreateUserRequest;
+import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
+import com.bonsai.accountservice.exceptions.InvalidOTPException;
+import com.bonsai.accountservice.exceptions.AppException;
+import com.bonsai.accountservice.exceptions.AppException;
+import com.bonsai.accountservice.exceptions.InvalidOTPException;
+import com.bonsai.accountservice.models.*;
+import com.bonsai.accountservice.repositories.KYCRepo;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.EmailService;
 import com.bonsai.accountservice.services.OTPService;
 import com.bonsai.accountservice.services.OTPStorage;
 import com.bonsai.accountservice.services.RegistrationService;
-import com.bonsai.sharedservice.exceptions.InvalidOTPException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import javax.transaction.Transactional;
+import java.time.LocalDate;
+import com.bonsai.accountservice.services.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 @Service
 @Slf4j
@@ -23,6 +38,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final OTPService otpService;
     private final OTPStorage otpStorage;
     private final UserCredentialRepo userCredentialRepo;
+    private final KYCRepo kycRepo;
+    private final StorageService storageService;
+    private final ObjectMapper objectMapper;
+    private final StorageNameService storageName;
+    private Contact contact;
+    private Finance finance;
+    private Address permanentAddress;
+    private Address temporaryAddress;
 
     @Override
     public void sendEmailOTP(String email) {
@@ -45,8 +68,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if(otpCodeWithVerification == null){
             throw new InvalidOTPException("Receive an OTP code first.");
         }
-
-        String storedOtp= otpCodeWithVerification.getOtpCode();
+        String storedOtp = otpCodeWithVerification.getOtpCode();
         if(storedOtp == null || !storedOtp.equals(request.otp())){
             throw new InvalidOTPException("otpCode not verified");
         }
@@ -74,8 +96,53 @@ public class RegistrationServiceImpl implements RegistrationService {
                         .build()
         );
         otpStorage.delete(email);
+    }
 
+    @Transactional
+    @Override
+    public void saveKYC(RegisterKYCRequest request) {
+        MultipartFile profilePhotoFile=request.profilePhoto();
+        MultipartFile citizenShipPhotoFrontFile=request.citizenShipPhotoFront();
+        MultipartFile citizenShipPhotoBackFile=request.citizenShipPhotoBack();
 
+        String profilePhotoFileStorageName=storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
+        String citizenShipPhotoFrontFileStorageName=storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(),FileCategory.CITIZENSHIP_FRONT);
+        String citizenShipPhotoBackFileStorageName=storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(),FileCategory.CITIZENSHIP_BACK);
+        try {
+            contact = objectMapper.readValue(request.contact(),Contact.class);
+            finance = objectMapper.readValue(request.finance(),Finance.class);
+            permanentAddress = objectMapper.readValue(request.permanentAddress(),Address.class);
+            temporaryAddress = objectMapper.readValue(request.temporaryAddress(),Address.class);
+        } catch (JsonProcessingException e) {
+            throw new AppException("Unable to process Json Data", HttpStatus.BAD_REQUEST);
+        }
+        KYC kyc = KYC.builder()
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .middleName(request.middleName())
+                .citizenShipNumber(request.citizenShipNumber())
+                .dob(LocalDate.parse(request.dob()))
+                .maritalStatus(request.maritalStatus())
+                .children(Boolean.parseBoolean(request.children()))
+                .currentlyStudying(Boolean.parseBoolean(request.currentlyStudying()))
+                .occupation(request.occupation())
+                .finance(finance)
+                .contact(contact)
+                .permanentAddress(permanentAddress.toString())
+                .temporaryAddress(temporaryAddress.toString())
+                .profilePhoto(profilePhotoFileStorageName)
+                .citizenShipPhotoFront(citizenShipPhotoFrontFileStorageName)
+                .citizenShipPhotoBack(citizenShipPhotoBackFileStorageName)
+                .build();
+
+        kycRepo.save(kyc);
+        UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
+                .orElseThrow(() ->new AppException("Email not found in database.",HttpStatus.NOT_FOUND));
+        userCredential.setKyc(kyc);
+        userCredentialRepo.save(userCredential);
+        storageService.store(profilePhotoFile,profilePhotoFileStorageName);
+        storageService.store(citizenShipPhotoFrontFile,citizenShipPhotoFrontFileStorageName);
+        storageService.store(citizenShipPhotoBackFile,citizenShipPhotoBackFileStorageName);
 
     }
 }

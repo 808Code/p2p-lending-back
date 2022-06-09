@@ -1,4 +1,4 @@
-package com.bonsai.accountservice.models;
+package com.bonsai.accountservice.constants;
 
 public class Roles {
     public static final String BORROWER = "BORROWER";
