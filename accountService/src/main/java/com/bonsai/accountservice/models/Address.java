@@ -3,7 +3,6 @@ package com.bonsai.accountservice.models;
 import lombok.*;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.UUID;
@@ -11,7 +10,6 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 public class Address{
