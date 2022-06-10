@@ -2,12 +2,12 @@ package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.dto.request.GetKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyKYCRequest;
-import com.bonsai.accountservice.exceptions.AppException;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.KYCRepo;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.KYCService;
+import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

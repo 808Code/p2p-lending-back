@@ -1,7 +1,6 @@
 package com.bonsai.accountservice.controllers;
 
 import com.bonsai.accountservice.dto.request.*;
-import com.bonsai.accountservice.dto.response.SuccessResponse;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.services.KYCService;
@@ -9,6 +8,7 @@ import com.bonsai.accountservice.dto.request.CreateUserRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 import com.bonsai.accountservice.services.RegistrationService;
+import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

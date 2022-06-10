@@ -1,8 +1,8 @@
 package com.bonsai.accountservice.controllers;
 
 import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
-import com.bonsai.accountservice.dto.response.SuccessResponse;
 import com.bonsai.accountservice.services.RegistrationService;
+import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

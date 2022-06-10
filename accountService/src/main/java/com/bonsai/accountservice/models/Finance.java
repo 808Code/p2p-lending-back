@@ -1,5 +1,7 @@
 package com.bonsai.accountservice.models;
 
+
+
 import lombok.*;
 
 import javax.persistence.*;

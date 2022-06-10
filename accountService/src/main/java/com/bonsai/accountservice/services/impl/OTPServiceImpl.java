@@ -2,7 +2,6 @@ package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.services.OTPService;
 import org.springframework.stereotype.Service;
-
 import java.text.DecimalFormat;
 import java.util.Random;
 
