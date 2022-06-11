@@ -35,6 +35,9 @@ public class KYC {
     @Column(nullable = false)
     private LocalDate dob;
 
+    @Column
+    private String gender;
+
 
 
     @Column(nullable = false)

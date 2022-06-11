@@ -3,12 +3,14 @@ package com.bonsai.accountservice.dto.request;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
+
 public record RegisterKYCRequest(
         String email,
         String firstName,
         String middleName,
         String lastName,
-        String Gender,
+        String gender,
         String citizenShipNumber,
         String dob,
         String maritalStatus,
@@ -19,8 +21,11 @@ public record RegisterKYCRequest(
         String permanentAddress,
         String contact,
         String finance,
+        @NotNull
         MultipartFile profilePhoto,
+        @NotNull
         MultipartFile citizenShipPhotoFront,
+        @NotNull
         MultipartFile citizenShipPhotoBack
         ){}
 
