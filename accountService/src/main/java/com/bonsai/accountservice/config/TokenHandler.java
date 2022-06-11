@@ -1,7 +1,9 @@
 package com.bonsai.accountservice.config;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 import java.util.Date;
 
@@ -23,9 +25,19 @@ public class TokenHandler {
     }
 
     public static String getEmailFromToken(String token) {
-        return JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
-                .build()
-                .verify(token.replace(TOKEN_PREFIX,""))
+
+        JWTVerifier verifier = JWT
+                .require(Algorithm.HMAC512(SECRET.getBytes()))
+                .build();
+
+        return verifier
+                .verify(token)
                 .getSubject();
+    }
+
+    public static boolean hasTokenExpired(String token) {
+        DecodedJWT decoder = JWT.decode(token);
+        Date expiryDate = decoder.getExpiresAt();
+        return expiryDate.before(new Date());
     }
 }
