@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static com.bonsai.accountservice.constants.SecurityConstant.HEADER_STRING;
 import static com.bonsai.accountservice.constants.SecurityConstant.TOKEN_PREFIX;
@@ -53,6 +54,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return null;
         }
 
-        return new UsernamePasswordAuthenticationToken(userEmail, null);
+        return new UsernamePasswordAuthenticationToken(userEmail, null, new ArrayList<>());
     }
 }
