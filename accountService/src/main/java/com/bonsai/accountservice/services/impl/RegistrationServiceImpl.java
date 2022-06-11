@@ -121,6 +121,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .citizenShipNumber(request.citizenShipNumber())
                 .dob(LocalDate.parse(request.dob()))
                 .maritalStatus(request.maritalStatus())
+                .gender(request.gender())
                 .children(Boolean.parseBoolean(request.children()))
                 .currentlyStudying(Boolean.parseBoolean(request.currentlyStudying()))
                 .occupation(request.occupation())

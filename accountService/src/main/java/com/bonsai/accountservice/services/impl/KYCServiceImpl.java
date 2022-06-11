@@ -20,14 +20,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KYCServiceImpl implements KYCService {
     private final UserCredentialRepo userCredentialRepo;
-    private final KYCRepo kycRepo;
 
     @Override
     public KYC getKYC(GetKYCRequest request) {
         UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
                 .orElseThrow(() ->new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
-        KYC kyc = kycRepo.findById(userCredential.getKyc().getId())
-                .orElseThrow(() ->new AppException("KYC not found in database.", HttpStatus.NOT_FOUND));
+
+        KYC kyc = userCredential.getKyc();
+
+        if(kyc == null) {
+            throw new AppException("KYC not found in database.", HttpStatus.NOT_FOUND);
+        }
 
         return kyc;
     }
