@@ -2,12 +2,12 @@ package com.bonsai.accountservice.controllers.login;
 
 import com.bonsai.accountservice.config.TokenHandler;
 import com.bonsai.accountservice.dto.request.UserCredentialDto;
-import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.UserCredentialService;
 import com.bonsai.sharedservice.dtos.response.ErrorResponse;
 import com.bonsai.sharedservice.dtos.response.LoginResponse;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +34,7 @@ public class LoginController {
         UserCredentialDto foundUser = userCredentialService.findByEmail(user.email());
 
         if (foundUser == null || !bCryptPasswordEncoder.matches(user.password(), foundUser.password())) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Login failed"));
+            return new ResponseEntity(new ErrorResponse("Login failed"), HttpStatus.UNAUTHORIZED);
         }
 
         return ResponseEntity.ok().body(
