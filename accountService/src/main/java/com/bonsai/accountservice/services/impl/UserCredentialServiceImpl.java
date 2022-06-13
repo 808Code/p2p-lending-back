@@ -21,10 +21,10 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public UserCredentialDto findByEmailAndRole(String email, String role) throws AppException {
-        UserCredential userCredential = userCredentialRepo.findByEmailAndRole(email, role)
+    public UserCredentialDto findByEmail(String email) throws AppException {
+        UserCredential userCredential = userCredentialRepo.findByEmail(email)
                 .orElseThrow(
-                        () -> new AppException(role + " of this email doesn't exist", HttpStatus.BAD_REQUEST)
+                        () -> new AppException("Account of this email doesn't exist", HttpStatus.BAD_REQUEST)
                 );
         return new UserCredentialDto(userCredential);
     }

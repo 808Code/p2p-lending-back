@@ -31,7 +31,7 @@ public class LoginController {
     @PostMapping
     public ResponseEntity<?> loginUser(@RequestBody UserCredentialDto user) {
 
-        UserCredentialDto foundUser = userCredentialService.findByEmailAndRole(user.email(), user.role());
+        UserCredentialDto foundUser = userCredentialService.findByEmail(user.email());
 
         if (foundUser == null || !bCryptPasswordEncoder.matches(user.password(), foundUser.password())) {
             return ResponseEntity.badRequest().body(new ErrorResponse("Login failed"));
@@ -40,7 +40,8 @@ public class LoginController {
         return ResponseEntity.ok().body(
                 new SuccessResponse("Login successful as " + foundUser.role(),
                         new LoginResponse("Access token generated",
-                                TokenHandler.generateToken(foundUser.email())
+                                TokenHandler.generateToken(foundUser.email(), foundUser.role()),
+                                foundUser.role()
                         )
                 )
         );

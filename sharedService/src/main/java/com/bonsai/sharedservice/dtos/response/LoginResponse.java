@@ -7,6 +7,7 @@ package com.bonsai.sharedservice.dtos.response;
  */
 public record LoginResponse(
         String message,
-        String token
+        String token,
+        String role
 ) {
 }

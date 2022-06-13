@@ -16,9 +16,10 @@ import static com.bonsai.accountservice.constants.SecurityConstant.*;
  */
 public class TokenHandler {
 
-    public static String generateToken(String email) {
+    public static String generateToken(String email, String role) {
         return JWT.create()
                 .withSubject(email)
+                .withClaim("role", role)
                 //expiration time is 15 minutes
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(Algorithm.HMAC512(SECRET.getBytes()));

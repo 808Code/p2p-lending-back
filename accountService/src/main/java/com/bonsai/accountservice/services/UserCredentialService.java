@@ -9,5 +9,5 @@ import com.bonsai.sharedservice.exceptions.AppException;
  * @since 2022-06-11
  */
 public interface UserCredentialService {
-    UserCredentialDto findByEmailAndRole(String email, String role) throws AppException;
+    UserCredentialDto findByEmail(String email) throws AppException;
 }

@@ -33,36 +33,31 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
+
         String bearerToken = req.getHeader(HEADER_STRING);
 
-        if (bearerToken == null || !bearerToken.startsWith(TOKEN_PREFIX)) {
-            chain.doFilter(req, res);
-            return;
+        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
+            String token = bearerToken.replace(TOKEN_PREFIX, "");
+
+            //if token has expired send error response
+            if (TokenHandler.hasTokenExpired(token)) {
+                createErrorResponse(res, "Access token has expired", 400);
+                return;
+            }
+
+            try {
+                UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+                //token not verified
+                if (authentication == null) {
+                    createErrorResponse(res, "Authorization failed!", 400);
+                    return;
+                }
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                createErrorResponse(res, "Authentication failed!", 401);
+            }
         }
-
-        String token = bearerToken.replace(TOKEN_PREFIX, "");
-
-        //if token has expired send error response
-        if (TokenHandler.hasTokenExpired(token)) {
-
-            PrintWriter out = res.getWriter();
-
-            Gson gson = new Gson();
-            String tokenExpired = gson.toJson(new ErrorResponse("Access token has expired"));
-
-            res.setContentType("application/json");
-            res.setCharacterEncoding("UTF-8");
-            res.setStatus(400);
-
-            out.print(tokenExpired);
-            out.flush();
-
-            return;
-        }
-
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(req, res);
     }
 
@@ -77,5 +72,20 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         return new UsernamePasswordAuthenticationToken(userEmail, null, new ArrayList<>());
+    }
+
+    void createErrorResponse(HttpServletResponse response, String message, Integer code) throws IOException {
+
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        String toSend = gson.toJson(new ErrorResponse(message));
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(code);
+
+        out.print(toSend);
+        out.flush();
     }
 }
