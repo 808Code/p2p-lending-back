@@ -1,7 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.constants.FileCategory;
-import com.bonsai.accountservice.dto.request.CreateUserRequest;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
@@ -18,6 +18,7 @@ import com.bonsai.sharedservice.exceptions.InvalidOTPException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
@@ -44,6 +45,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private Finance finance;
     private Address permanentAddress;
     private Address temporaryAddress;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public void sendEmailOTP(String email) {
@@ -76,7 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void saveEmailPassword(CreateUserRequest request,String role) {
+    public void saveEmailPassword(UserAuth request, String role) {
         String email = request.email();
 
         if(userCredentialRepo.findByEmail(email).isPresent()){
@@ -89,7 +92,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         userCredentialRepo.save(
                 UserCredential.builder()
                         .email(request.email())
-                        .password(request.password())
+                        .password(bCryptPasswordEncoder.encode(request.password()))
                         .role(role)
                         .build()
         );

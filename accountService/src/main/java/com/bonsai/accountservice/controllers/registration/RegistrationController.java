@@ -1,10 +1,10 @@
-package com.bonsai.accountservice.controllers;
+package com.bonsai.accountservice.controllers.registration;
 
 import com.bonsai.accountservice.dto.request.*;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.services.KYCService;
-import com.bonsai.accountservice.dto.request.CreateUserRequest;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 import com.bonsai.accountservice.services.RegistrationService;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/registration")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
@@ -43,7 +43,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/createBorrower")
-    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody CreateUserRequest request){
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody UserAuth request){
         registrationService.saveEmailPassword(request, Roles.BORROWER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Borrower.", true)
@@ -51,13 +51,12 @@ public class RegistrationController {
     }
 
     @PostMapping("/createInvestor")
-    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody CreateUserRequest request){
+    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody UserAuth request){
         registrationService.saveEmailPassword(request,Roles.INVESTOR);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Investor.", true)
         );
     }
-
 
     @PostMapping("/verifyKYC")
     public ResponseEntity<SuccessResponse> verifyKYC(@RequestBody VerifyKYCRequest request){
@@ -74,6 +73,5 @@ public class RegistrationController {
                 new SuccessResponse("KYC for "+request.email(),kyc)
         );
     }
-
 
 }
