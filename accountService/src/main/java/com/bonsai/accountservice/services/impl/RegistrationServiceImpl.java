@@ -1,7 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.constants.FileCategory;
-import com.bonsai.accountservice.dto.request.UserCredentialDto;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.storage.OTP;
@@ -79,7 +79,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public void saveEmailPassword(UserCredentialDto request, String role) {
+    public void saveEmailPassword(UserAuth request, String role) {
         String email = request.email();
 
         if(userCredentialRepo.findByEmail(email).isPresent()){

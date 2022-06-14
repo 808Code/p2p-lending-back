@@ -41,7 +41,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
             //if token has expired send error response
             if (TokenHandler.hasTokenExpired(token)) {
-                createErrorResponse(res, "Access token has expired", 400);
+                createErrorResponse(res, "Access token has expired", 401);
                 return;
             }
 
@@ -49,7 +49,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                 UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
                 //token not verified
                 if (authentication == null) {
-                    createErrorResponse(res, "Authorization failed!", 400);
+                    createErrorResponse(res, "Authorization failed!", 401);
                     return;
                 }
 

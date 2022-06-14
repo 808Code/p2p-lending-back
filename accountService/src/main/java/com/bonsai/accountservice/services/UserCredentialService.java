@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.services;
 
-import com.bonsai.accountservice.dto.request.UserCredentialDto;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.sharedservice.exceptions.AppException;
 
 /**
@@ -9,5 +9,5 @@ import com.bonsai.sharedservice.exceptions.AppException;
  * @since 2022-06-11
  */
 public interface UserCredentialService {
-    UserCredentialDto findByEmail(String email) throws AppException;
+    UserAuth findByEmail(String email) throws AppException;
 }

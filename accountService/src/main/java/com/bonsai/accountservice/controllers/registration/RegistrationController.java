@@ -4,7 +4,7 @@ import com.bonsai.accountservice.dto.request.*;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.services.KYCService;
-import com.bonsai.accountservice.dto.request.UserCredentialDto;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
 import com.bonsai.accountservice.services.RegistrationService;
@@ -43,7 +43,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/createBorrower")
-    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody UserCredentialDto request){
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody UserAuth request){
         registrationService.saveEmailPassword(request, Roles.BORROWER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Borrower.", true)
@@ -51,7 +51,7 @@ public class RegistrationController {
     }
 
     @PostMapping("/createInvestor")
-    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody UserCredentialDto request){
+    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody UserAuth request){
         registrationService.saveEmailPassword(request,Roles.INVESTOR);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Investor.", true)

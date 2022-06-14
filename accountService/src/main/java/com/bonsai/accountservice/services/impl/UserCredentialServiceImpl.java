@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.services.impl;
 
-import com.bonsai.accountservice.dto.request.UserCredentialDto;
+import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.UserCredentialService;
@@ -21,11 +21,11 @@ public class UserCredentialServiceImpl implements UserCredentialService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public UserCredentialDto findByEmail(String email) throws AppException {
+    public UserAuth findByEmail(String email) throws AppException {
         UserCredential userCredential = userCredentialRepo.findByEmail(email)
                 .orElseThrow(
                         () -> new AppException("Account of this email doesn't exist", HttpStatus.BAD_REQUEST)
                 );
-        return new UserCredentialDto(userCredential);
+        return new UserAuth(userCredential);
     }
 }
