@@ -50,11 +50,11 @@ public class RegistrationController {
         );
     }
 
-    @PostMapping("/createInvestor")
-    public ResponseEntity<SuccessResponse> createInvestor(@RequestBody UserAuth request){
-        registrationService.saveEmailPassword(request,Roles.INVESTOR);
+    @PostMapping("/createLender")
+    public ResponseEntity<SuccessResponse> createLENDER(@RequestBody UserAuth request){
+        registrationService.saveEmailPassword(request,Roles.LENDER);
         return ResponseEntity.ok(
-                new SuccessResponse("Account Created as Investor.", true)
+                new SuccessResponse("Account Created as Lender.", true)
         );
     }
 
