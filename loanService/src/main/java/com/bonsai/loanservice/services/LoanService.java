@@ -11,6 +11,6 @@ import java.util.UUID;
  * @since 2022-05-25
  */
 public interface LoanService {
-    LoanRequestDto save(LoanRequestDto loanRequestDto) throws ParseException;
+    LoanRequestDto save(LoanRequestDto loanRequestDto);
     LoanRequestDto findById(UUID id);
 }

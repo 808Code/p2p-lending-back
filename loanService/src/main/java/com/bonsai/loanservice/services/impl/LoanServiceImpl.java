@@ -1,5 +1,6 @@
 package com.bonsai.loanservice.services.impl;
 
+import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.dto.LoanRequestDto;
@@ -29,11 +30,20 @@ public class LoanServiceImpl implements LoanService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public LoanRequestDto save(LoanRequestDto loanRequestDto) throws ParseException {
+    public LoanRequestDto save(LoanRequestDto loanRequestDto) {
 
-        UserCredential borrower = userCredentialRepo.findById(loanRequestDto.borrowerId()).orElseThrow(
+        UserCredential borrower = userCredentialRepo.findByIdAndRole(loanRequestDto.borrowerId(), Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
+
+        if (!borrower.isKycVerified()) {
+            throw new AppException("Kyc not verified", HttpStatus.BAD_REQUEST);
+        }
+
+        if (borrower.isOngoingLoan()) {
+            throw new AppException("Borrower already has an ongoing loan", HttpStatus.BAD_REQUEST);
+        }
+
         LoanRequest loanRequest = LoanRequest.builder()
                 .id(loanRequestDto.id())
                 .borrower(borrower)
@@ -43,6 +53,9 @@ public class LoanServiceImpl implements LoanService {
                 .loanType(loanRequestDto.loanType())
                 .approvalStatus(false)
                 .build();
+
+        borrower.setOngoingLoan(true);
+        userCredentialRepo.save(borrower);
         return new LoanRequestDto(loanRequestRepo.save(loanRequest));
     }
 
