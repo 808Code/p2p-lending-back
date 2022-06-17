@@ -3,6 +3,7 @@ package com.bonsai.loanservice.services;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -14,4 +15,5 @@ public interface LoanService {
     LoanResponse save(LoanRequestDto loanRequestDto);
     LoanRequestDto findById(UUID id);
 
+    List<LoanResponse> findAllByBorrower(UUID borrowerId);
 }

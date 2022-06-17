@@ -8,13 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * @author Narendra
@@ -35,6 +33,13 @@ public class LoanController {
         }
         return ResponseEntity.ok(
                 new SuccessResponse("Loan request created successfully", loanService.save(loanRequestDto))
+        );
+    }
+
+    @GetMapping("/borrower/findAllLoan/{borrowerId}")
+    public ResponseEntity<SuccessResponse> findAllBorrowerLoan(@PathVariable UUID borrowerId) {
+        return ResponseEntity.ok(
+                new SuccessResponse("Loan request list fetched successfully", loanService.findAllByBorrower(borrowerId))
         );
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -62,5 +63,14 @@ public class LoanServiceImpl implements LoanService {
     public LoanRequestDto findById(UUID id) {
         LoanRequest loanRequest = loanRequestRepo.findById(id).orElseThrow(() -> new AppException("Loan not found", HttpStatus.BAD_REQUEST));
         return new LoanRequestDto(loanRequest);
+    }
+
+    @Override
+    public List<LoanResponse> findAllByBorrower(UUID borrowerId) {
+        UserCredential borrower = userCredentialRepo.findByIdAndRole(borrowerId, Roles.BORROWER).orElseThrow(
+                () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
+        );
+
+        return LoanResponse.loanToDtoList(loanRequestRepo.findAllByBorrower(borrowerId));
     }
 }
