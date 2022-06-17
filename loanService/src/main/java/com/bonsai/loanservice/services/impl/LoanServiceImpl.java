@@ -4,6 +4,7 @@ import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.dto.LoanRequestDto;
+import com.bonsai.loanservice.dto.LoanResponse;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LoanService;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -30,7 +30,7 @@ public class LoanServiceImpl implements LoanService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public LoanRequestDto save(LoanRequestDto loanRequestDto) {
+    public LoanResponse save(LoanRequestDto loanRequestDto) {
 
         UserCredential borrower = userCredentialRepo.findByIdAndRole(loanRequestDto.borrowerId(), Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
@@ -45,7 +45,6 @@ public class LoanServiceImpl implements LoanService {
         }
 
         LoanRequest loanRequest = LoanRequest.builder()
-                .id(loanRequestDto.id())
                 .borrower(borrower)
                 .requestedDate(LocalDate.now())
                 .duration(loanRequestDto.duration())
@@ -56,7 +55,7 @@ public class LoanServiceImpl implements LoanService {
 
         borrower.setOngoingLoan(true);
         userCredentialRepo.save(borrower);
-        return new LoanRequestDto(loanRequestRepo.save(loanRequest));
+        return new LoanResponse(loanRequestRepo.save(loanRequest));
     }
 
     @Override
