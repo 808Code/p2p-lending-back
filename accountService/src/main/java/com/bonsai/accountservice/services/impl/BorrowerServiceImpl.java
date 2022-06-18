@@ -23,8 +23,8 @@ public class BorrowerServiceImpl implements BorrowerService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public boolean isBorrowerEligibleForLoan(UUID id) {
-        UserCredential borrower = userCredentialRepo.findByIdAndRole(id, Roles.BORROWER).orElseThrow(
+    public boolean isBorrowerEligibleForLoan(String email) {
+        UserCredential borrower = userCredentialRepo.findByEmailAndRole(email, Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
 

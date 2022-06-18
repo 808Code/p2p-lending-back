@@ -33,7 +33,7 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public LoanResponse save(LoanRequestDto loanRequestDto) {
 
-        UserCredential borrower = userCredentialRepo.findByIdAndRole(loanRequestDto.borrowerId(), Roles.BORROWER).orElseThrow(
+        UserCredential borrower = userCredentialRepo.findByEmailAndRole(loanRequestDto.borrower(), Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
 
@@ -66,11 +66,11 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public List<LoanResponse> findAllByBorrower(UUID borrowerId) {
-        UserCredential borrower = userCredentialRepo.findByIdAndRole(borrowerId, Roles.BORROWER).orElseThrow(
+    public List<LoanResponse> findAllByBorrower(String borrowerEmail) {
+        UserCredential borrower = userCredentialRepo.findByEmailAndRole(borrowerEmail, Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
 
-        return LoanResponse.loanToDtoList(loanRequestRepo.findAllByBorrower(borrowerId));
+        return LoanResponse.loanToDtoList(loanRequestRepo.findAllByBorrower(borrower.getEmail()));
     }
 }

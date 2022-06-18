@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 /**
  * @author Narendra
  * @version 1.0
@@ -23,10 +21,10 @@ public class BorrowerController {
 
     private final BorrowerService borrowerService;
 
-    @GetMapping("/borrower/isEligible/{borrowerId}")
-    public ResponseEntity<SuccessResponse> isBorrowerEligible(@PathVariable UUID borrowerId) {
+    @GetMapping("/borrower/isEligible/{borrowerEmail}")
+    public ResponseEntity<SuccessResponse> isBorrowerEligible(@PathVariable String borrowerEmail) {
         return ResponseEntity.ok(
-                new SuccessResponse("Borrower eligibility for loan fetched", borrowerService.isBorrowerEligibleForLoan(borrowerId))
+                new SuccessResponse("Borrower eligibility for loan fetched", borrowerService.isBorrowerEligibleForLoan(borrowerEmail))
         );
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.text.ParseException;
-import java.util.UUID;
 
 /**
  * @author Narendra
@@ -36,10 +35,10 @@ public class LoanController {
         );
     }
 
-    @GetMapping("/borrower/findAllLoan/{borrowerId}")
-    public ResponseEntity<SuccessResponse> findAllBorrowerLoan(@PathVariable UUID borrowerId) {
+    @GetMapping("/borrower/findAllLoan/{borrowerEmail}")
+    public ResponseEntity<SuccessResponse> findAllBorrowerLoan(@PathVariable String borrowerEmail) {
         return ResponseEntity.ok(
-                new SuccessResponse("Loan request list fetched successfully", loanService.findAllByBorrower(borrowerId))
+                new SuccessResponse("Loan request list fetched successfully", loanService.findAllByBorrower(borrowerEmail))
         );
     }
 }

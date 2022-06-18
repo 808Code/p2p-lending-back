@@ -2,11 +2,11 @@ package com.bonsai.loanservice.dto;
 
 import com.bonsai.loanservice.models.LoanRequest;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -15,8 +15,9 @@ import java.util.stream.Collectors;
  * @since 2022-05-25
  */
 public record LoanRequestDto(
-        @NotNull(message = "Borrower id can't be null")
-        UUID borrowerId,
+        @NotEmpty(message = "Borrower email can't be empty")
+        @Email(message = "Borrower email is invalid")
+        String borrower,
 
         @NotNull(message = "Loan amount can't be null")
         @Min(value = 1000, message = "Loan amount can't be less than 1000")
@@ -31,7 +32,7 @@ public record LoanRequestDto(
 ) {
 
     public LoanRequestDto(LoanRequest loanRequest) {
-        this(loanRequest.getBorrower().getId(), loanRequest.getAmount(),
+        this(loanRequest.getBorrower().getEmail(), loanRequest.getAmount(),
                 loanRequest.getDuration(), loanRequest.getLoanType());
     }
 

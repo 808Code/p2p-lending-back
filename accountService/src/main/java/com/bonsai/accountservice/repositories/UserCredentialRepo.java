@@ -10,4 +10,5 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
 
     Optional<UserCredential> findByIdAndRole(UUID id, String role);
     Optional<UserCredential> findByEmail(String email);
+    Optional<UserCredential> findByEmailAndRole(String email, String role);
 }

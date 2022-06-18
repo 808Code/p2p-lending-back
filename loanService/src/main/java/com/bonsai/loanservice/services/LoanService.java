@@ -15,5 +15,5 @@ public interface LoanService {
     LoanResponse save(LoanRequestDto loanRequestDto);
     LoanRequestDto findById(UUID id);
 
-    List<LoanResponse> findAllByBorrower(UUID borrowerId);
+    List<LoanResponse> findAllByBorrower(String borrowerEmail);
 }
