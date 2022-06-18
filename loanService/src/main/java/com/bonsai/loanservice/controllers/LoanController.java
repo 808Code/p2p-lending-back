@@ -41,4 +41,11 @@ public class LoanController {
                 new SuccessResponse("Loan request list fetched successfully", loanService.findAllByBorrower(borrowerEmail))
         );
     }
+
+    @GetMapping("/getAllLoanTypes")
+    public ResponseEntity<SuccessResponse> findAllLoanTypes() {
+        return ResponseEntity.ok(
+                new SuccessResponse("Loan type list fetched successfully", loanService.findAllLoanTypes())
+        );
+    }
 }

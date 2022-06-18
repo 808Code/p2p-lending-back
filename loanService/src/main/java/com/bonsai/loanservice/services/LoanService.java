@@ -16,4 +16,6 @@ public interface LoanService {
     LoanRequestDto findById(UUID id);
 
     List<LoanResponse> findAllByBorrower(String borrowerEmail);
+
+    List<String> findAllLoanTypes();
 }

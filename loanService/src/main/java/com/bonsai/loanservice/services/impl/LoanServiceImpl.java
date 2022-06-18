@@ -3,6 +3,7 @@ package com.bonsai.loanservice.services.impl;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
+import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
 import com.bonsai.loanservice.models.LoanRequest;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,5 +74,17 @@ public class LoanServiceImpl implements LoanService {
         );
 
         return LoanResponse.loanToDtoList(loanRequestRepo.findAllByBorrower(borrower.getEmail()));
+    }
+
+    @Override
+    public List<String> findAllLoanTypes() {
+        List<String> loanTypes = new ArrayList<>();
+        loanTypes.add(LoanType.EDUCATIONAL);
+        loanTypes.add(LoanType.VEHICLE);
+        loanTypes.add(LoanType.AGRICULTURAL);
+        loanTypes.add(LoanType.HEALTH);
+        loanTypes.add(LoanType.HOME);
+        loanTypes.add(LoanType.BUSINESS);
+        return loanTypes;
     }
 }
