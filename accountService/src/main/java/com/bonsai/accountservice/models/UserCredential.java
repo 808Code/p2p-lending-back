@@ -25,9 +25,11 @@ public class UserCredential {
     @Column(nullable = false)
     private String role;
 
-
     @Column(nullable = false)
-    private boolean kycVerified=false;
+    private boolean kycVerified = false;
+
+    @Column(name = "ongoing_loan")
+    private boolean ongoingLoan = false;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "kyc_id", referencedColumnName = "id")
