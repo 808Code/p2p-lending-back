@@ -2,7 +2,6 @@ package com.bonsai.loanservice.dto;
 
 import com.bonsai.loanservice.models.LoanRequest;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -16,13 +15,13 @@ public record LoanResponse (
         UUID id,
         String borrower,
         Long amount,
-        LocalDate requestedDate,
+        String requestedDate,
         Integer duration,
         String loanType,
         Boolean approvalStatus
 ) {
     public LoanResponse(LoanRequest loanRequest) {
-        this(loanRequest.getId(), loanRequest.getBorrower().getEmail(), loanRequest.getAmount(), loanRequest.getRequestedDate(),
+        this(loanRequest.getId(), loanRequest.getBorrower().getEmail(), loanRequest.getAmount(), loanRequest.getRequestedDate().toString(),
                 loanRequest.getDuration(), loanRequest.getLoanType(), loanRequest.getApprovalStatus());
     }
 

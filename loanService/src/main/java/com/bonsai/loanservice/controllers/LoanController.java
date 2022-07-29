@@ -1,9 +1,12 @@
 package com.bonsai.loanservice.controllers;
 
+import com.bonsai.loanservice.dto.LoanResponse;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.services.LoanService;
+import com.bonsai.sharedservice.rmq.MessagingConfig;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +23,17 @@ import javax.validation.Valid;
 public class LoanController {
 
     private final LoanService loanService;
-
+    private final RabbitTemplate rabbitTemplate;
     @PostMapping("/createLoan")
     public ResponseEntity<SuccessResponse> createLoan(@Valid @RequestBody LoanRequestDto loanRequestDto) {
+        //save the loan request to database
+        LoanResponse loanResponse = loanService.save(loanRequestDto);
+        //push the created loan to queue
+        rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, loanResponse);
+
+        //return response
         return ResponseEntity.ok(
-                new SuccessResponse("Loan request created successfully", loanService.save(loanRequestDto))
+                new SuccessResponse("Loan request created successfully", loanResponse)
         );
     }
 
