@@ -3,6 +3,7 @@ package com.bonsai.loansuggestionservice.services.impl;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanSuggestionStatus;
+import com.bonsai.loanservice.dto.LoanResponse;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loansuggestionservice.models.LoanSuggestion;
@@ -69,5 +70,10 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
         //once the loan is suggested to lenders change its suggestion status to suggested and save it into database
         loanRequest.setSuggestionStatus(LoanSuggestionStatus.SUGGESTED);
         loanRequestRepo.save(loanRequest);
+    }
+
+    @Override
+    public List<LoanResponse> findSuggestedLoansForLender(String email) {
+        return loanSuggestionRepo.findAllSuggestedLoansForLender(email);
     }
 }
