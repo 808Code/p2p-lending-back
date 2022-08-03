@@ -29,7 +29,7 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
 
     @Override
     @Transactional
-    public Boolean save(UUID loanRequestId, List<UserCredential> lenders) {
+    public void save(UUID loanRequestId, List<UserCredential> lenders) {
 
         LoanRequest loanRequest = loanRequestRepo.findById(loanRequestId)
                 .orElseThrow(() -> new AppException("Invalid loan id from queue", HttpStatus.INTERNAL_SERVER_ERROR));
@@ -44,6 +44,5 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
                 throw new AppException("Loan Suggestion can't be created", HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-        return true;
     }
 }
