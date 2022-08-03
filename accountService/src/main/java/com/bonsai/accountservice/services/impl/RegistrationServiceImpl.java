@@ -1,6 +1,7 @@
 package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.constants.FileCategory;
+import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.RegisterKYCRequest;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
@@ -21,8 +22,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+
 import com.bonsai.accountservice.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +55,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void sendEmailOTP(String email) {
         String otp = otpService.generateOTP();
 
-        String emailBody = "otpCode is "+otp;
+        String emailBody = "otpCode is " + otp;
         String subject = "Verify your Email";
 
         emailService.sendEmail(email, subject, emailBody);
@@ -63,18 +66,18 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public void verifyEmailOTP(VerifyOTPRequest request) {
-        String email=request.email();
+        String email = request.email();
         OTP otpCodeWithVerification = otpStorage.getOtp(email);
 
-        if(otpCodeWithVerification == null){
+        if (otpCodeWithVerification == null) {
             throw new InvalidOTPException("Receive an OTP code first.");
         }
         String storedOtp = otpCodeWithVerification.getOtpCode();
-        if(storedOtp == null || !storedOtp.equals(request.otp())){
+        if (storedOtp == null || !storedOtp.equals(request.otp())) {
             throw new InvalidOTPException("otpCode not verified");
         }
         otpCodeWithVerification.setVerification(true);
-        log.info("Changed email {} {}",email,otpCodeWithVerification );
+        log.info("Changed email {} {}", email, otpCodeWithVerification);
 
     }
 
@@ -82,7 +85,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void saveEmailPassword(UserAuth request, String role) {
         String email = request.email();
 
-        if(userCredentialRepo.findByEmail(email).isPresent()){
+        if (userCredentialRepo.findByEmail(email).isPresent()) {
             throw new InvalidOTPException("Email Already Registered.");
         }
         OTP otpCodeWithVerification = otpStorage.getOtp(email);
@@ -94,6 +97,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                         .email(request.email())
                         .password(bCryptPasswordEncoder.encode(request.password()))
                         .role(role)
+                        .lastActiveDate(role.equals(Roles.LENDER) ? LocalDate.now() : null)
                         .build()
         );
         otpStorage.delete(email);
@@ -102,18 +106,18 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     @Override
     public void saveKYC(RegisterKYCRequest request) {
-        MultipartFile profilePhotoFile=request.profilePhoto();
-        MultipartFile citizenShipPhotoFrontFile=request.citizenShipPhotoFront();
-        MultipartFile citizenShipPhotoBackFile=request.citizenShipPhotoBack();
+        MultipartFile profilePhotoFile = request.profilePhoto();
+        MultipartFile citizenShipPhotoFrontFile = request.citizenShipPhotoFront();
+        MultipartFile citizenShipPhotoBackFile = request.citizenShipPhotoBack();
 
-        String profilePhotoFileStorageName=storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
-        String citizenShipPhotoFrontFileStorageName=storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(),FileCategory.CITIZENSHIP_FRONT);
-        String citizenShipPhotoBackFileStorageName=storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(),FileCategory.CITIZENSHIP_BACK);
+        String profilePhotoFileStorageName = storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
+        String citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
+        String citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
         try {
-            contact = objectMapper.readValue(request.contact(),Contact.class);
-            finance = objectMapper.readValue(request.finance(),Finance.class);
-            permanentAddress = objectMapper.readValue(request.permanentAddress(),Address.class);
-            temporaryAddress = objectMapper.readValue(request.temporaryAddress(),Address.class);
+            contact = objectMapper.readValue(request.contact(), Contact.class);
+            finance = objectMapper.readValue(request.finance(), Finance.class);
+            permanentAddress = objectMapper.readValue(request.permanentAddress(), Address.class);
+            temporaryAddress = objectMapper.readValue(request.temporaryAddress(), Address.class);
         } catch (JsonProcessingException e) {
             throw new AppException("Unable to process Json Data", HttpStatus.BAD_REQUEST);
         }
@@ -139,12 +143,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         kycRepo.save(kyc);
         UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
-                .orElseThrow(() ->new AppException("Email not found in database.",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
         userCredential.setKyc(kyc);
         userCredentialRepo.save(userCredential);
-        storageService.store(profilePhotoFile,profilePhotoFileStorageName);
-        storageService.store(citizenShipPhotoFrontFile,citizenShipPhotoFrontFileStorageName);
-        storageService.store(citizenShipPhotoBackFile,citizenShipPhotoBackFileStorageName);
+        storageService.store(profilePhotoFile, profilePhotoFileStorageName);
+        storageService.store(citizenShipPhotoFrontFile, citizenShipPhotoFrontFileStorageName);
+        storageService.store(citizenShipPhotoBackFile, citizenShipPhotoBackFileStorageName);
 
     }
 }
