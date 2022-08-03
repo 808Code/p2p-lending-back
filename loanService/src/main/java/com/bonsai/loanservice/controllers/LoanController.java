@@ -1,6 +1,7 @@
 package com.bonsai.loanservice.controllers;
 
 import com.bonsai.loanservice.dto.LoanResponse;
+import com.bonsai.sharedservice.dtos.loan.LoanInQueue;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.services.LoanService;
@@ -24,12 +25,15 @@ public class LoanController {
 
     private final LoanService loanService;
     private final RabbitTemplate rabbitTemplate;
+
     @PostMapping("/createLoan")
     public ResponseEntity<SuccessResponse> createLoan(@Valid @RequestBody LoanRequestDto loanRequestDto) {
         //save the loan request to database
         LoanResponse loanResponse = loanService.save(loanRequestDto);
+
         //push the created loan to queue
-        rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, loanResponse);
+        LoanInQueue loanInQueue = new LoanInQueue(loanResponse.id(), loanResponse.borrower());
+        rabbitTemplate.convertAndSend(MessagingConfig.EXCHANGE, MessagingConfig.ROUTING_KEY, loanInQueue);
 
         //return response
         return ResponseEntity.ok(
