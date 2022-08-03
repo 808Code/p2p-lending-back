@@ -13,5 +13,5 @@ import java.util.UUID;
  */
 public interface LoanSuggestionService {
     @Transactional
-    void save(UUID loanRequestId, List<UserCredential> lenders);
+    void save(UUID loanRequestId);
 }
