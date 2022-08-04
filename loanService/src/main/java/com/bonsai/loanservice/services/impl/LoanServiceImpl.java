@@ -53,6 +53,7 @@ public class LoanServiceImpl implements LoanService {
                 .requestedDate(LocalDate.now())
                 .duration(loanRequestDto.duration())
                 .amount(loanRequestDto.amount())
+                .remainingAmount(loanRequestDto.amount())
                 .loanType(loanRequestDto.loanType())
                 .approvalStatus(false)
                 .suggestionStatus(LoanSuggestionStatus.NEW)

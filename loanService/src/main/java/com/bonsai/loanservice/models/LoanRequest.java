@@ -45,4 +45,7 @@ public class LoanRequest {
 
     @Column(name = "suggestion_status")
     private String suggestionStatus;
+
+    @Column(name = "remaining_amount")
+    private Long remainingAmount;
 }
