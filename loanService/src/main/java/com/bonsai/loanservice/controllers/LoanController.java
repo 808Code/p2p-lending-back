@@ -20,6 +20,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("/api/v1/")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class LoanController {
 
