@@ -4,6 +4,7 @@ import com.bonsai.loansuggestionservice.services.LoanSuggestionService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
+@CrossOrigin("*")
 public class LoanSuggestionController {
 
     private final LoanSuggestionService loanSuggestionService;
 
     @GetMapping("/getLoanSuggestionsForLender/{email}")
-    public ResponseEntity<SuccessResponse> findAllSuggestedLoansForLender(@PathVariable("email") String email) {
+    public ResponseEntity<SuccessResponse> findAllSuggestedLoansForLender(@PathVariable String email) {
         return ResponseEntity.ok(new SuccessResponse("Suggested loans for borrower fetched successfully",
                 loanSuggestionService.findSuggestedLoansForLender(email)));
     }
