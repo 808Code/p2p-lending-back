@@ -3,6 +3,7 @@ package com.bonsai.loanservice.services.impl;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
+import com.bonsai.loanservice.constants.LoanSuggestionStatus;
 import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
@@ -52,8 +53,10 @@ public class LoanServiceImpl implements LoanService {
                 .requestedDate(LocalDate.now())
                 .duration(loanRequestDto.duration())
                 .amount(loanRequestDto.amount())
+                .remainingAmount(loanRequestDto.amount())
                 .loanType(loanRequestDto.loanType())
                 .approvalStatus(false)
+                .suggestionStatus(LoanSuggestionStatus.NEW)
                 .build();
 
         borrower.setOngoingLoan(true);

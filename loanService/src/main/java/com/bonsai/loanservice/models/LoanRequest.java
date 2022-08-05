@@ -1,6 +1,7 @@
 package com.bonsai.loanservice.models;
 
 import com.bonsai.accountservice.models.UserCredential;
+import com.bonsai.loanservice.constants.LoanSuggestionStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -41,4 +42,10 @@ public class LoanRequest {
 
     @Column(name = "loan_type")
     private String loanType;
+
+    @Column(name = "suggestion_status")
+    private String suggestionStatus;
+
+    @Column(name = "remaining_amount")
+    private Long remainingAmount;
 }

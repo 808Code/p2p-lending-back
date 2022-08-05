@@ -3,6 +3,7 @@ package com.bonsai.accountservice.models;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Builder
@@ -34,4 +35,7 @@ public class UserCredential {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "kyc_id", referencedColumnName = "id")
     private KYC kyc;
+
+    @Column(name = "last_active_date")
+    private LocalDate lastActiveDate;
 }
