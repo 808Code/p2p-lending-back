@@ -28,10 +28,10 @@ public class BorrowerServiceImpl implements BorrowerService {
         );
 
         if (!borrower.isKycVerified()) {
-            return new BorrowerEligibilityResponse(false, "Borrower's kyc is not verified");
+            return new BorrowerEligibilityResponse(false, "Your kyc is not verified yet");
         }
         if (borrower.isOngoingLoan()) {
-            return new BorrowerEligibilityResponse(false, "Borrower still has an ongoing loan");
+            return new BorrowerEligibilityResponse(false, "You have an ongoing loan");
         }
         return new BorrowerEligibilityResponse(true, null);
     }
