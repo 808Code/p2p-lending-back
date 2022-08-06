@@ -33,7 +33,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Transactional
     @Override
-    public UUID loadWallet(Long amount, String user) {
+    public BigDecimal loadWallet(Long amount, String user) {
         Wallet wallet = walletRepo.findByUserEmail(user);
 
         //if user doesn't have wallet create it
@@ -60,10 +60,13 @@ public class WalletServiceImpl implements WalletService {
         walletTransaction.setRemarks("Amount Loaded into wallet");
         walletRepo.save(wallet);
         walletTransactionRepo.save(walletTransaction);
-        return wallet.getId();
+
+        return wallet.getAmount();
     }
     @Override
     public BigDecimal fetchBalanceFromWallet(String email) {
-        return walletRepo.fetchBalanceFromWallet(email);
+        BigDecimal walletBalance = walletRepo.fetchBalanceFromWallet(email);
+
+        return walletBalance == null ? BigDecimal.ZERO : walletBalance;
     }
 }
