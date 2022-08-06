@@ -7,7 +7,7 @@ package com.bonsai.accountservice.constants;
  */
 public class SecurityConstant {
     public static final String SECRET = "karnivore69";
-    public static final long EXPIRATION_TIME = 900_000_000; // 15 minutes
+    public static final long EXPIRATION_TIME = 86_400_000L; // 24 hrs
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
 }
