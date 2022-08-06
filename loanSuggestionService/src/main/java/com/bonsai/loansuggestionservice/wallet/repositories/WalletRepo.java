@@ -4,6 +4,7 @@ import com.bonsai.loansuggestionservice.wallet.models.Wallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -18,5 +19,5 @@ public interface WalletRepo extends JpaRepository<Wallet, UUID> {
             "from wallet w\n" +
             "inner join user_credential uc on uc.id = w.user_id\n" +
             "and uc.email = ?1")
-    Long fetchBalanceFromWallet(String email);
+    BigDecimal fetchBalanceFromWallet(String email);
 }

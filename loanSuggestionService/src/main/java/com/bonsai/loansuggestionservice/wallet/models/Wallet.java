@@ -4,6 +4,7 @@ import com.bonsai.accountservice.models.UserCredential;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -28,5 +29,5 @@ public class Wallet {
             foreignKey = @ForeignKey(name = "FK_Wallet_User"))
     private UserCredential user;
 
-    private Long amount;
+    private BigDecimal amount;
 }

@@ -1,5 +1,6 @@
 package com.bonsai.loansuggestionservice.wallet.services;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -9,5 +10,5 @@ import java.util.UUID;
  */
 public interface WalletService {
     public UUID loadWallet(Long amount, String user);
-    Long fetchBalanceFromWallet(String email);
+    BigDecimal fetchBalanceFromWallet(String email);
 }

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class WalletServiceImpl implements WalletService {
             //need to change amount datatype from long to double
             wallet = walletRepo.saveAndFlush(
                     Wallet.builder()
-                            .amount(0L)
+                            .amount(BigDecimal.valueOf(0))
                             .user(userCredential)
                             .build()
             );
@@ -53,7 +54,7 @@ public class WalletServiceImpl implements WalletService {
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDateTime.now());
 
-        wallet.setAmount(wallet.getAmount() + amount);
+        wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
 
         walletTransaction.setRemarks("Amount Loaded into wallet");
@@ -62,7 +63,7 @@ public class WalletServiceImpl implements WalletService {
         return wallet.getId();
     }
     @Override
-    public Long fetchBalanceFromWallet(String email) {
+    public BigDecimal fetchBalanceFromWallet(String email) {
         return walletRepo.fetchBalanceFromWallet(email);
     }
 }
