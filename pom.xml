@@ -26,6 +26,7 @@
         <module>accountService</module>
         <module>loanService</module>
         <module>sharedService</module>
+        <module>loanSuggestionService</module>
     </modules>
 
     <dependencies>
