@@ -1,6 +1,6 @@
-package com.bonsai.loansuggestionservice.controllers;
+package com.bonsai.loansuggestionservice.loanSuggestion.controllers;
 
-import com.bonsai.loansuggestionservice.services.LoanSuggestionService;
+import com.bonsai.loansuggestionservice.loanSuggestion.services.LoanSuggestionService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

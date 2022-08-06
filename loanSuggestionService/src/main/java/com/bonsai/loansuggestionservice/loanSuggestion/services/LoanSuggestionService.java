@@ -1,4 +1,4 @@
-package com.bonsai.loansuggestionservice.services;
+package com.bonsai.loansuggestionservice.loanSuggestion.services;
 
 import javax.transaction.Transactional;
 import java.util.List;

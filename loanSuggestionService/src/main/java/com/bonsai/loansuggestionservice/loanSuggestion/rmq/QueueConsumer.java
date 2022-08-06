@@ -1,6 +1,6 @@
-package com.bonsai.loansuggestionservice.rmq;
+package com.bonsai.loansuggestionservice.loanSuggestion.rmq;
 
-import com.bonsai.loansuggestionservice.services.LoanSuggestionService;
+import com.bonsai.loansuggestionservice.loanSuggestion.services.LoanSuggestionService;
 import com.bonsai.sharedservice.dtos.loan.LoanInQueue;
 import com.bonsai.sharedservice.rmq.MessagingConfig;
 import lombok.RequiredArgsConstructor;

@@ -1,13 +1,13 @@
-package com.bonsai.loansuggestionservice.services.impl;
+package com.bonsai.loansuggestionservice.loanSuggestion.services.impl;
 
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanSuggestionStatus;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
-import com.bonsai.loansuggestionservice.models.LoanSuggestion;
-import com.bonsai.loansuggestionservice.repositories.LoanSuggestionRepo;
-import com.bonsai.loansuggestionservice.services.LoanSuggestionService;
+import com.bonsai.loansuggestionservice.loanSuggestion.models.LoanSuggestion;
+import com.bonsai.loansuggestionservice.loanSuggestion.repositories.LoanSuggestionRepo;
+import com.bonsai.loansuggestionservice.loanSuggestion.services.LoanSuggestionService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
