@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -51,7 +51,7 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
 
         WalletTransaction walletTransaction = new WalletTransaction();
         walletTransaction.setWallet(wallet);
-        walletTransaction.setDate(LocalDate.now());
+        walletTransaction.setDate(LocalDateTime.now());
 
         wallet.setAmount(wallet.getAmount() + amount);
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
