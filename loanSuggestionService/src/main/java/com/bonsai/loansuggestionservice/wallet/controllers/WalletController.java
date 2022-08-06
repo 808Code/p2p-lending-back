@@ -1,6 +1,6 @@
 package com.bonsai.loansuggestionservice.wallet.controllers;
 
-import com.bonsai.loansuggestionservice.wallet.dtos.WalletLoadRequest;
+import com.bonsai.loansuggestionservice.wallet.dtos.LoadWalletRequest;
 import com.bonsai.loansuggestionservice.wallet.services.WalletService;
 import com.bonsai.loansuggestionservice.wallet.services.WalletTransactionService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
@@ -23,12 +23,12 @@ public class WalletController {
     private final WalletTransactionService walletTransactionService;
     private final WalletService walletService;
 
-    @PostMapping("/makeTransaction")
-    public ResponseEntity<SuccessResponse> loadAmount(@Valid @RequestBody WalletLoadRequest walletLoadRequest,
+    @PostMapping("/loadBalance")
+    public ResponseEntity<SuccessResponse> loadAmount(@Valid @RequestBody LoadWalletRequest loadWalletRequest,
                                                       Authentication authentication) {
         String user = (String) authentication.getPrincipal();
-        return ResponseEntity.ok(new SuccessResponse("Transaction done successFully",
-                walletTransactionService.createTransaction(walletLoadRequest, user)));
+        return ResponseEntity.ok(new SuccessResponse("Balance load successful",
+                walletTransactionService.loadWallet(loadWalletRequest.amount(), user)));
     }
     @GetMapping("/getBalance")
     public ResponseEntity<SuccessResponse> getWalletBalance(Authentication authentication) {

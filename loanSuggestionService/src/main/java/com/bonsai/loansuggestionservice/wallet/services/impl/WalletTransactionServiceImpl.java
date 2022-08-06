@@ -3,7 +3,6 @@ package com.bonsai.loansuggestionservice.wallet.services.impl;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loansuggestionservice.wallet.constants.WalletTransactionTypes;
-import com.bonsai.loansuggestionservice.wallet.dtos.WalletLoadRequest;
 import com.bonsai.loansuggestionservice.wallet.models.Wallet;
 import com.bonsai.loansuggestionservice.wallet.models.WalletTransaction;
 import com.bonsai.loansuggestionservice.wallet.repositories.WalletRepo;
@@ -33,7 +32,7 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
 
     @Transactional
     @Override
-    public UUID createTransaction(WalletLoadRequest walletLoadRequest, String user) {
+    public UUID loadWallet(Long amount, String user) {
         Wallet wallet = walletRepo.findByUserEmail(user);
 
         //if user doesn't have wallet create it
@@ -54,30 +53,10 @@ public class WalletTransactionServiceImpl implements WalletTransactionService {
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDate.now());
 
-        //in case of loading amount into wallet
-        if (walletLoadRequest.transactionType().equalsIgnoreCase(WalletTransactionTypes.CREDIT)) {
-            wallet.setAmount(wallet.getAmount() + walletLoadRequest.amount());
-            walletTransaction.setType(WalletTransactionTypes.CREDIT);
-        }
+        wallet.setAmount(wallet.getAmount() + amount);
+        walletTransaction.setType(WalletTransactionTypes.CREDIT);
 
-        //in case of amount withdrawal
-        else if (walletLoadRequest.transactionType().equalsIgnoreCase(WalletTransactionTypes.DEBIT)) {
-
-            //in case of insufficient balance abort
-            if (wallet.getAmount() < walletLoadRequest.amount()) {
-                throw new AppException("Insufficient balance in the wallet", HttpStatus.BAD_REQUEST);
-            }
-
-            wallet.setAmount(wallet.getAmount() - walletLoadRequest.amount());
-            walletTransaction.setType(WalletTransactionTypes.DEBIT);
-        }
-
-        //there is also locked state, that functionality will be added in future
-        else {
-            throw new AppException("Invalid load type", HttpStatus.BAD_REQUEST);
-        }
-
-        walletTransaction.setRemarks(walletLoadRequest.remarks());
+        walletTransaction.setRemarks("Amount Loaded into wallet");
         walletRepo.save(wallet);
         walletTransactionRepo.save(walletTransaction);
         return wallet.getId();

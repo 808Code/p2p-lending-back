@@ -1,6 +1,5 @@
 package com.bonsai.loansuggestionservice.wallet.dtos;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -8,10 +7,7 @@ import javax.validation.constraints.NotNull;
  * @version 1.0
  * @since 2022-08-06
  */
-public record WalletLoadRequest (
+public record LoadWalletRequest (
         @NotNull
-        Long amount,
-        String remarks,
-        @NotEmpty
-        String transactionType
+        Long amount
 ) {}

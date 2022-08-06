@@ -1,7 +1,5 @@
 package com.bonsai.loansuggestionservice.wallet.services;
 
-import com.bonsai.loansuggestionservice.wallet.dtos.WalletLoadRequest;
-
 import javax.transaction.Transactional;
 import java.util.UUID;
 
@@ -13,5 +11,5 @@ import java.util.UUID;
 public interface WalletTransactionService {
 
     @Transactional
-    UUID createTransaction(WalletLoadRequest walletLoadRequest, String user);
+    UUID loadWallet(Long amount, String user);
 }
