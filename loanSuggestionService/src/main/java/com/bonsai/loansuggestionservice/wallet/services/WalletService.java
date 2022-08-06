@@ -9,6 +9,6 @@ import java.util.UUID;
  * @since 2022-08-06
  */
 public interface WalletService {
-    public UUID loadWallet(Long amount, String user);
+    BigDecimal loadWallet(Long amount, String user);
     BigDecimal fetchBalanceFromWallet(String email);
 }
