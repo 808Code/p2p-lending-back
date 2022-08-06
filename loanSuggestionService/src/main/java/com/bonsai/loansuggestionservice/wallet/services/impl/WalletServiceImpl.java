@@ -64,6 +64,8 @@ public class WalletServiceImpl implements WalletService {
     }
     @Override
     public BigDecimal fetchBalanceFromWallet(String email) {
-        return walletRepo.fetchBalanceFromWallet(email);
+        BigDecimal walletBalance = walletRepo.fetchBalanceFromWallet(email);
+
+        return walletBalance == null ? BigDecimal.ZERO : walletBalance;
     }
 }
