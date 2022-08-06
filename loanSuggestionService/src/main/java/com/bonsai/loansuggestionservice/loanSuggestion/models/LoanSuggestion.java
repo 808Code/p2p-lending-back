@@ -1,4 +1,4 @@
-package com.bonsai.loansuggestionservice.models;
+package com.bonsai.loansuggestionservice.loanSuggestion.models;
 
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.loanservice.models.LoanRequest;

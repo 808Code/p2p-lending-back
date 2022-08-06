@@ -1,6 +1,6 @@
-package com.bonsai.loansuggestionservice.repositories;
+package com.bonsai.loansuggestionservice.loanSuggestion.repositories;
 
-import com.bonsai.loansuggestionservice.models.LoanSuggestion;
+import com.bonsai.loansuggestionservice.loanSuggestion.models.LoanSuggestion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
