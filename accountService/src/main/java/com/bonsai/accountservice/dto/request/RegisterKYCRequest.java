@@ -21,11 +21,8 @@ public record RegisterKYCRequest(
         String permanentAddress,
         String contact,
         String finance,
-        @NotNull
         MultipartFile profilePhoto,
-        @NotNull
         MultipartFile citizenShipPhotoFront,
-        @NotNull
         MultipartFile citizenShipPhotoBack
         ){}
 

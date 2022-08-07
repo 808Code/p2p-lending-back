@@ -50,7 +50,6 @@ public class KYC {
     @Column(nullable = false)
     private boolean currentlyStudying;
 
-    @Column(nullable = false)
     private String occupation;
 
     @Column(nullable = false)
@@ -78,6 +77,8 @@ public class KYC {
     @Column
     private String  citizenShipPhotoBack;
 
+    @Transient
+    private boolean verified;
 }
 
 
