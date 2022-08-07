@@ -107,12 +107,27 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     @Override
     public void saveKYC(RegisterKYCRequest request) {
+
+        UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
+
+        KYC persisted = userCredential.getKyc();
+
         MultipartFile profilePhotoFile = request.profilePhoto();
         MultipartFile citizenShipPhotoFrontFile = request.citizenShipPhotoFront();
         MultipartFile citizenShipPhotoBackFile = request.citizenShipPhotoBack();
         String profilePhotoFileStorageName = "";
         String citizenShipPhotoFrontFileStorageName = "";
         String citizenShipPhotoBackFileStorageName = "";
+
+
+        if(persisted != null && citizenShipPhotoFrontFile == null){
+            citizenShipPhotoFrontFileStorageName = persisted.getCitizenShipPhotoFront();
+        }
+        if(persisted != null && citizenShipPhotoBackFile == null){
+            citizenShipPhotoBackFileStorageName = persisted.getCitizenShipPhotoBack();
+        }
+
 
         if(profilePhotoFile != null){
             storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
@@ -149,9 +164,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .citizenShipPhotoBack(citizenShipPhotoBackFileStorageName)
                 .build();
 
+
         kycRepo.save(kyc);
-        UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
-                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
 
         userCredential.setKyc(kyc);
         userCredential.setKycVerified(false);
