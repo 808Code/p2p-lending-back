@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ public class WalletTransaction {
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "FK_Wallet_Transaction_Wallet"))
     private Wallet wallet;
+
+    private BigDecimal amount;
 
     private String type;
 
