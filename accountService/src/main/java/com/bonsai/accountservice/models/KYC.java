@@ -77,6 +77,8 @@ public class KYC {
     @Column
     private String  citizenShipPhotoBack;
 
+    @Transient
+    private boolean verified;
 }
 
 
