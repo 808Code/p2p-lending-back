@@ -22,9 +22,7 @@ public record RegisterKYCRequest(
         String contact,
         String finance,
         MultipartFile profilePhoto,
-        @NotNull
         MultipartFile citizenShipPhotoFront,
-        @NotNull
         MultipartFile citizenShipPhotoBack
         ){}
 
