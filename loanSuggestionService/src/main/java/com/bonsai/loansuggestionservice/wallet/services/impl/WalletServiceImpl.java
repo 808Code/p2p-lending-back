@@ -16,7 +16,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Narendra
@@ -53,6 +54,7 @@ public class WalletServiceImpl implements WalletService {
         WalletTransaction walletTransaction = new WalletTransaction();
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDateTime.now());
+        walletTransaction.setAmount(BigDecimal.valueOf(amount));
 
         wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
@@ -68,5 +70,10 @@ public class WalletServiceImpl implements WalletService {
         BigDecimal walletBalance = walletRepo.fetchBalanceFromWallet(email);
 
         return walletBalance == null ? BigDecimal.ZERO : walletBalance;
+    }
+
+    @Override
+    public List<Map<String, Object>> findAllTransactionsByUserEmail(String email) {
+        return walletTransactionRepo.findAllTransactionsByUserEmail(email);
     }
 }

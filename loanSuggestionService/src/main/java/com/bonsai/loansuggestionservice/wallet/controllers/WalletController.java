@@ -34,4 +34,11 @@ public class WalletController {
         return ResponseEntity.ok(new SuccessResponse("Balance fetched successfully",
                 walletService.fetchBalanceFromWallet(user)));
     }
+
+    @GetMapping("/getAllTransactions")
+    public ResponseEntity<SuccessResponse> getAllTransactions(Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(new SuccessResponse("Wallet Transaction List fetched successfully",
+                walletService.findAllTransactionsByUserEmail(user)));
+    }
 }
