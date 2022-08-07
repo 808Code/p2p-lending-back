@@ -23,15 +23,17 @@ public class Address{
     @Column(nullable = false)
     String district;
 
+    String municipality;
+
     @Column(nullable = false)
-    String wardNo;
+    String ward;
 
     @Column(nullable = false)
     String tole;
 
     @Override
     public String toString() {
-        return this.province+","+this.district+","+this.wardNo+","+this.tole;
+        return this.district+","+this.province+","+this.municipality+","+this.ward +","+this.tole;
     }
 
 }

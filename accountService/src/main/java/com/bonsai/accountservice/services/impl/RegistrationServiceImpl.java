@@ -16,6 +16,7 @@ import com.bonsai.accountservice.services.OTPStorage;
 import com.bonsai.accountservice.services.RegistrationService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.sharedservice.exceptions.InvalidOTPException;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -109,13 +110,21 @@ public class RegistrationServiceImpl implements RegistrationService {
         MultipartFile profilePhotoFile = request.profilePhoto();
         MultipartFile citizenShipPhotoFrontFile = request.citizenShipPhotoFront();
         MultipartFile citizenShipPhotoBackFile = request.citizenShipPhotoBack();
+        String profilePhotoFileStorageName = "";
+        String citizenShipPhotoFrontFileStorageName = "";
+        String citizenShipPhotoBackFileStorageName = "";
 
-        String profilePhotoFileStorageName = storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
-        String citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
-        String citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
+        if(profilePhotoFile != null){
+            storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
+        }
+        if(citizenShipPhotoBackFile != null){
+            citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
+        }
+        if(citizenShipPhotoFrontFile != null){
+            citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
+        }
         try {
             contact = objectMapper.readValue(request.contact(), Contact.class);
-            finance = objectMapper.readValue(request.finance(), Finance.class);
             permanentAddress = objectMapper.readValue(request.permanentAddress(), Address.class);
             temporaryAddress = objectMapper.readValue(request.temporaryAddress(), Address.class);
         } catch (JsonProcessingException e) {
@@ -131,9 +140,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .gender(request.gender())
                 .children(Boolean.parseBoolean(request.children()))
                 .currentlyStudying(Boolean.parseBoolean(request.currentlyStudying()))
-                .occupation(request.occupation())
-                .finance(finance)
                 .contact(contact)
+                .occupation("")
                 .permanentAddress(permanentAddress.toString())
                 .temporaryAddress(temporaryAddress.toString())
                 .profilePhoto(profilePhotoFileStorageName)
@@ -144,11 +152,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         kycRepo.save(kyc);
         UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
                 .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
+
         userCredential.setKyc(kyc);
+        userCredential.setKycVerified(false);
         userCredentialRepo.save(userCredential);
-        storageService.store(profilePhotoFile, profilePhotoFileStorageName);
-        storageService.store(citizenShipPhotoFrontFile, citizenShipPhotoFrontFileStorageName);
-        storageService.store(citizenShipPhotoBackFile, citizenShipPhotoBackFileStorageName);
+        if(profilePhotoFile != null){
+            storageService.store(profilePhotoFile, profilePhotoFileStorageName);
+        }
+        if(citizenShipPhotoBackFile != null){
+            storageService.store(citizenShipPhotoBackFile, citizenShipPhotoBackFileStorageName);
+        }
+        if(citizenShipPhotoFrontFile != null){
+            storageService.store(citizenShipPhotoFrontFile, citizenShipPhotoFrontFileStorageName);
+        }
 
     }
 }
