@@ -35,32 +35,28 @@ public class WalletServiceImpl implements WalletService {
     @Transactional
     @Override
     public BigDecimal loadWallet(Long amount, String user) {
+
+        //get the wallet of the given user
         Wallet wallet = walletRepo.findByUserEmail(user);
 
-        //if user doesn't have wallet create it
-        if (wallet == null) {
-            UserCredential userCredential = userCredentialRepo.findByEmail(user)
-                    .orElseThrow(() -> new AppException("Logged in user is invalid", HttpStatus.INTERNAL_SERVER_ERROR));
-            //create user wallet with zero balance
-            //need to change amount datatype from long to double
-            wallet = walletRepo.saveAndFlush(
-                    Wallet.builder()
-                            .amount(BigDecimal.valueOf(0))
-                            .user(userCredential)
-                            .build()
-            );
+        if(wallet == null) {
+            throw new AppException("User of given email not found", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        //add amount to wallet
+        wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
+
+        //build transaction for this operation
         WalletTransaction walletTransaction = new WalletTransaction();
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDateTime.now());
         walletTransaction.setAmount(BigDecimal.valueOf(amount));
-
-        wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
-
         walletTransaction.setRemarks("Amount Loaded into wallet");
+
+        //save updated wallet into database
         walletRepo.save(wallet);
+        //create new transaction and save it into database
         walletTransactionRepo.save(walletTransaction);
 
         return wallet.getAmount();
