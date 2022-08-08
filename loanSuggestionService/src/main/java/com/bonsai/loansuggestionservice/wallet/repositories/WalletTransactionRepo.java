@@ -17,8 +17,7 @@ public interface WalletTransactionRepo extends JpaRepository<WalletTransaction, 
 
     @Query(nativeQuery = true, value = "select cast(w.id as varchar),\n" +
             "       w.amount,\n" +
-            "       date(w.date) as date,\n" +
-            "       cast(w.date as time) as time,\n" +
+            "       w.date as date,\n" +
             "       w.remarks    as remarks,\n" +
             "       w.type       as type\n" +
             "from wallet_transaction w\n" +
