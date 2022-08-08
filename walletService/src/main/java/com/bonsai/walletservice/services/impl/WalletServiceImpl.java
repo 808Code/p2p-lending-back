@@ -1,6 +1,5 @@
 package com.bonsai.walletservice.services.impl;
 
-import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.Wallet;
@@ -62,10 +61,8 @@ public class WalletServiceImpl implements WalletService {
         return wallet.getAmount();
     }
     @Override
-    public BigDecimal fetchBalanceFromWallet(String email) {
-        BigDecimal walletBalance = walletRepo.fetchBalanceFromWallet(email);
-
-        return walletBalance == null ? BigDecimal.ZERO : walletBalance;
+    public Map<String, BigDecimal> fetchBalanceFromWallet(String email) {
+        return walletRepo.fetchBalanceFromWallet(email);
     }
 
     @Override

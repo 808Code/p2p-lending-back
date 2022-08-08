@@ -11,6 +11,6 @@ import java.util.Map;
  */
 public interface WalletService {
     BigDecimal loadWallet(Long amount, String user);
-    BigDecimal fetchBalanceFromWallet(String email);
+    Map<String, BigDecimal> fetchBalanceFromWallet(String email);
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
 }

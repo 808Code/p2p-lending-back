@@ -9,4 +9,5 @@ public class WalletTransactionTypes {
     public static final String DEBIT = "DEBIT";
     public static final String CREDIT = "CREDIT";
     public static final String LOCKED = "LOCKED";
+    public static final String RELEASED = "RELEASED";
 }
