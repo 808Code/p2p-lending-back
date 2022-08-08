@@ -3,6 +3,7 @@ package com.bonsai.loanservice.services.impl;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
+import com.bonsai.loanservice.constants.LoanRequestAmount;
 import com.bonsai.loanservice.constants.LoanSuggestionStatus;
 import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
@@ -46,6 +47,14 @@ public class LoanServiceImpl implements LoanService {
 
         if (borrower.isOngoingLoan()) {
             throw new AppException("Borrower already has an ongoing loan", HttpStatus.BAD_REQUEST);
+        }
+
+        if (loanRequestDto.amount() < LoanRequestAmount.MIN || loanRequestDto.amount() > LoanRequestAmount.MAX) {
+            throw new AppException("Loan amount must be in between Rs." + LoanRequestAmount.MIN + " and Rs." + LoanRequestAmount.MAX, HttpStatus.BAD_REQUEST);
+        }
+
+        if (loanRequestDto.amount() % LoanRequestAmount.MIN != 0) {
+            throw new AppException("Loan amount must be in the multiples of Rs." + LoanRequestAmount.MIN, HttpStatus.BAD_REQUEST);
         }
 
         LoanRequest loanRequest = LoanRequest.builder()
