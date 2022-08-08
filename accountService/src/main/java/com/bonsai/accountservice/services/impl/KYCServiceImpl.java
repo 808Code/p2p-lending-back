@@ -27,10 +27,7 @@ public class KYCServiceImpl implements KYCService {
                 .orElseThrow(() ->new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
 
         KYC kyc = userCredential.getKyc();
-
-        if(kyc == null) {
-            throw new AppException("KYC not found in database.", HttpStatus.NOT_FOUND);
-        }
+        kyc.setVerified(userCredential.isKycVerified());
 
         return kyc;
     }
