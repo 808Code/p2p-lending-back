@@ -2,6 +2,7 @@ package com.bonsai.accountservice.repositories;
 
 import com.bonsai.accountservice.models.UserCredential;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -19,4 +20,9 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
             "where lower(u.role) = 'lender'\n" +
             "  and u.last_active_date >= date(current_date - interval '3 months')")
     List<UserCredential> findAllActiveLenders();
+
+    @Modifying
+    @Query(nativeQuery = true, value = "insert into wallet (id, user_id, amount)\n" +
+            "values (?1, ?2, 0)")
+    void createWallet(UUID id, UUID userId);
 }

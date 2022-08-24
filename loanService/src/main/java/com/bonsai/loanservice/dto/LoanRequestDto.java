@@ -1,11 +1,9 @@
 package com.bonsai.loanservice.dto;
 
+import com.bonsai.loanservice.constants.LoanRequestAmount;
 import com.bonsai.loanservice.models.LoanRequest;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +18,6 @@ public record LoanRequestDto(
         String borrower,
 
         @NotNull(message = "Loan amount can't be null")
-        @Min(value = 1000, message = "Loan amount can't be less than 1000")
         Long amount,
 
         @NotNull(message = "Loan duration can't be null")

@@ -16,7 +16,6 @@ import com.bonsai.accountservice.services.OTPStorage;
 import com.bonsai.accountservice.services.RegistrationService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.sharedservice.exceptions.InvalidOTPException;
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.UUID;
 
 import com.bonsai.accountservice.services.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -82,6 +82,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     }
 
+    @Transactional
     @Override
     public void saveEmailPassword(UserAuth request, String role) {
         String email = request.email();
@@ -93,14 +94,16 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (otpCodeWithVerification == null || !otpCodeWithVerification.getVerification()) {
             throw new InvalidOTPException("otpCode not verified");
         }
-        userCredentialRepo.save(
-                UserCredential.builder()
-                        .email(request.email())
-                        .password(bCryptPasswordEncoder.encode(request.password()))
-                        .role(role)
-                        .lastActiveDate(role.equals(Roles.LENDER) ? LocalDate.now() : null)
-                        .build()
-        );
+
+        UserCredential userCredential = UserCredential.builder()
+                .email(request.email())
+                .password(bCryptPasswordEncoder.encode(request.password()))
+                .role(role)
+                .lastActiveDate(role.equals(Roles.LENDER) ? LocalDate.now() : null)
+                .build();
+
+        userCredential = userCredentialRepo.save(userCredential);
+        userCredentialRepo.createWallet(UUID.randomUUID(), userCredential.getId());
         otpStorage.delete(email);
     }
 
@@ -121,21 +124,21 @@ public class RegistrationServiceImpl implements RegistrationService {
         String citizenShipPhotoBackFileStorageName = "";
 
 
-        if(persisted != null && citizenShipPhotoFrontFile == null){
+        if (persisted != null && citizenShipPhotoFrontFile == null) {
             citizenShipPhotoFrontFileStorageName = persisted.getCitizenShipPhotoFront();
         }
-        if(persisted != null && citizenShipPhotoBackFile == null){
+        if (persisted != null && citizenShipPhotoBackFile == null) {
             citizenShipPhotoBackFileStorageName = persisted.getCitizenShipPhotoBack();
         }
 
 
-        if(profilePhotoFile != null){
+        if (profilePhotoFile != null) {
             storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
         }
-        if(citizenShipPhotoBackFile != null){
+        if (citizenShipPhotoBackFile != null) {
             citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
         }
-        if(citizenShipPhotoFrontFile != null){
+        if (citizenShipPhotoFrontFile != null) {
             citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
         }
         try {
@@ -170,13 +173,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         userCredential.setKyc(kyc);
         userCredential.setKycVerified(false);
         userCredentialRepo.save(userCredential);
-        if(profilePhotoFile != null){
+        if (profilePhotoFile != null) {
             storageService.store(profilePhotoFile, profilePhotoFileStorageName);
         }
-        if(citizenShipPhotoBackFile != null){
+        if (citizenShipPhotoBackFile != null) {
             storageService.store(citizenShipPhotoBackFile, citizenShipPhotoBackFileStorageName);
         }
-        if(citizenShipPhotoFrontFile != null){
+        if (citizenShipPhotoFrontFile != null) {
             storageService.store(citizenShipPhotoFrontFile, citizenShipPhotoFrontFileStorageName);
         }
 
