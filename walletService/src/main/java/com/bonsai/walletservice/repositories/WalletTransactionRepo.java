@@ -15,14 +15,15 @@ import java.util.UUID;
  */
 public interface WalletTransactionRepo extends JpaRepository<WalletTransaction, UUID> {
 
-    @Query(nativeQuery = true, value = "select cast(w.id as varchar),\n" +
-            "       w.amount,\n" +
-            "       w.date as date,\n" +
-            "       w.remarks    as remarks,\n" +
-            "       w.type       as type\n" +
-            "from wallet_transaction w\n" +
-            "         inner join wallet w2 on w.wallet_id = w2.id\n" +
-            "         inner join user_credential uc on w2.user_id = uc.id\n" +
-            "    and uc.email = ?1")
+    @Query(nativeQuery = true, value = """
+            select cast(w.id as varchar),
+                   w.amount,
+                   w.date as date,
+                   w.remarks    as remarks,
+                   w.type       as type
+            from wallet_transaction w
+                     inner join wallet w2 on w.wallet_id = w2.id
+                     inner join user_credential uc on w2.user_id = uc.id
+                and uc.email = ?1""")
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
 }

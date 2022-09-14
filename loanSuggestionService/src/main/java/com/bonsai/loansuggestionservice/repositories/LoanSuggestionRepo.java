@@ -15,26 +15,28 @@ import java.util.UUID;
  */
 public interface LoanSuggestionRepo extends JpaRepository<LoanSuggestion, UUID> {
 
-    @Query(nativeQuery = true, value = "select cast(lr.id as varchar) as \"loanId\",\n" +
-            "       lr.amount              as \"loanAmount\",\n" +
-            "       lr.loan_type           as \"loanType\",\n" +
-            "       lr.remaining_amount    as \"remainingAmount\",\n" +
-            "       (case\n" +
-            "            when lr.remaining_amount >= ?3\n" +
-            "                then ?3\n" +
-            "            else lr.remaining_amount\n" +
-            "           end)               as \"maxLendingAmount\",\n" +
-            "       (\n" +
-            "           case\n" +
-            "               when lr.remaining_amount < ?2\n" +
-            "                   then 0\n" +
-            "               else ?2\n" +
-            "               end\n" +
-            "           )                  as \"minLendingAmount\"\n" +
-            "from loan_suggestion ls\n" +
-            "         inner join loan_request lr on lr.id = ls.loan_request_id\n" +
-            "         inner join user_credential uc on uc.id = ls.lender_id\n" +
-            "    and uc.email = ?1\n" +
-            "where lr.approval_status = false\n" )
+    @Query(nativeQuery = true, value = """
+            select cast(lr.id as varchar) as "loanId",
+                   lr.amount              as "loanAmount",
+                   lr.loan_type           as "loanType",
+                   lr.remaining_amount    as "remainingAmount",
+                   (case
+                        when lr.remaining_amount >= ?3
+                            then ?3
+                        else lr.remaining_amount
+                       end)               as "maxLendingAmount",
+                   (
+                       case
+                           when lr.remaining_amount < ?2
+                               then 0
+                           else ?2
+                           end
+                       )                  as "minLendingAmount"
+            from loan_suggestion ls
+                     inner join loan_request lr on lr.id = ls.loan_request_id
+                     inner join user_credential uc on uc.id = ls.lender_id
+                and uc.email = ?1
+            where lr.approval_status = false
+            """)
     List<Map<String, Object>> findAllSuggestedLoansForLender(String email, Long minLendingAmount, Long maxLendingAmount);
 }

@@ -15,10 +15,11 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
     Optional<UserCredential> findByEmail(String email);
     Optional<UserCredential> findByEmailAndRole(String email, String role);
 
-    @Query(nativeQuery = true, value = "select *\n" +
-            "from user_credential u\n" +
-            "where lower(u.role) = 'lender'\n" +
-            "  and u.last_active_date >= date(current_date - interval '3 months')")
+    @Query(nativeQuery = true, value = """
+            select *
+            from user_credential u
+            where lower(u.role) = 'lender'
+              and u.last_active_date >= date(current_date - interval '3 months')""")
     List<UserCredential> findAllActiveLenders();
 
     @Modifying
