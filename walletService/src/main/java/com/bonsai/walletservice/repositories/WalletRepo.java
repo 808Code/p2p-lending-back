@@ -16,16 +16,17 @@ import java.util.UUID;
 public interface WalletRepo extends JpaRepository<Wallet, UUID> {
     Wallet findByUserEmail(String email);
 
-    @Query(nativeQuery = true, value = "select w.amount                                    as \"toatalBalance\",\n" +
-            "       (w.amount - coalesce(a.\"lockedBalance\", 0)) as \"availableBalance\"\n" +
-            "from wallet w\n" +
-            "         inner join user_credential uc on uc.id = w.user_id and uc.email = ?1\n" +
-            "         left join (select wt.wallet_id,\n" +
-            "                           sum(wt.amount) as \"lockedBalance\"\n" +
-            "                    from wallet_transaction wt\n" +
-            "                             inner join wallet w on w.id = wt.wallet_id\n" +
-            "                             inner join user_credential u on w.user_id = u.id and u.email = ?1\n" +
-            "                    where lower(wt.type) = 'locked'\n" +
-            "                    group by wt.wallet_id) a on w.id = a.wallet_id")
+    @Query(nativeQuery = true, value = """
+            select w.amount as "toatalBalance",
+                   (w.amount - coalesce(a."lockedBalance", 0)) as "availableBalance"
+            from wallet w
+                     inner join user_credential uc on uc.id = w.user_id and uc.email = ?1
+                     left join (select wt.wallet_id,
+                                       sum(wt.amount) as "lockedBalance"
+                                from wallet_transaction wt
+                                         inner join wallet w on w.id = wt.wallet_id
+                                         inner join user_credential u on w.user_id = u.id and u.email = ?1
+                                where lower(wt.type) = 'locked'
+                                group by wt.wallet_id) a on w.id = a.wallet_id""")
     Map<String, BigDecimal> fetchBalanceFromWallet(String email);
 }
