@@ -36,7 +36,7 @@ public interface LoanSuggestionRepo extends JpaRepository<LoanSuggestion, UUID> 
                      inner join loan_request lr on lr.id = ls.loan_request_id
                      inner join user_credential uc on uc.id = ls.lender_id
                 and uc.email = ?1
-            where lr.approval_status = false
-            """)
+            where lr.loan_status in (upper('new'), upper('suggested'))
+                        """)
     List<Map<String, Object>> findAllSuggestedLoansForLender(String email, Long minLendingAmount, Long maxLendingAmount);
 }

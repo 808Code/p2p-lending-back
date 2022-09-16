@@ -18,12 +18,11 @@ public record LoanResponse (
         String requestedDate,
         Integer duration,
         String loanType,
-        Boolean approvalStatus,
-        String suggestionStatus
+        String loanStatus
 ) {
     public LoanResponse(LoanRequest loanRequest) {
         this(loanRequest.getId(), loanRequest.getBorrower().getEmail(), loanRequest.getAmount(), loanRequest.getRequestedDate().toString(),
-                loanRequest.getDuration(), loanRequest.getLoanType(), loanRequest.getApprovalStatus(), loanRequest.getSuggestionStatus());
+                loanRequest.getDuration(), loanRequest.getLoanType(), loanRequest.getLoanStatus());
     }
 
     public static List<LoanResponse> loanToDtoList(List<LoanRequest> loanList) {
