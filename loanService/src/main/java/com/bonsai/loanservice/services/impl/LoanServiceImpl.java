@@ -4,7 +4,7 @@ import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanRequestAmount;
-import com.bonsai.loanservice.constants.LoanSuggestionStatus;
+import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
@@ -64,8 +64,7 @@ public class LoanServiceImpl implements LoanService {
                 .amount(loanRequestDto.amount())
                 .remainingAmount(loanRequestDto.amount())
                 .loanType(loanRequestDto.loanType())
-                .approvalStatus(false)
-                .suggestionStatus(LoanSuggestionStatus.NEW)
+                .loanStatus(LoanStatus.NEW)
                 .build();
 
         borrower.setOngoingLoan(true);

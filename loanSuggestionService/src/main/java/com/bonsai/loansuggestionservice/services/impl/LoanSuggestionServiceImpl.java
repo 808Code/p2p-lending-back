@@ -1,17 +1,17 @@
 package com.bonsai.loansuggestionservice.services.impl;
 
+import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
-import com.bonsai.loanservice.constants.LoanSuggestionStatus;
+import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loansuggestionservice.models.LoanSuggestion;
 import com.bonsai.loansuggestionservice.repositories.LoanSuggestionRepo;
 import com.bonsai.loansuggestionservice.services.LoanSuggestionService;
-import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,6 +26,7 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoanSuggestionServiceImpl implements LoanSuggestionService {
 
     private final LoanSuggestionRepo loanSuggestionRepo;
@@ -43,10 +44,21 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
 
     @Override
     @Transactional
-    public void save(UUID loanRequestId) {
+    public void save(UUID loanRequestId, String borrowerEmail) {
 
-        LoanRequest loanRequest = loanRequestRepo.findById(loanRequestId)
-                .orElseThrow(() -> new AppException("Invalid loan id from queue", HttpStatus.INTERNAL_SERVER_ERROR));
+        LoanRequest loanRequest = loanRequestRepo.findById(loanRequestId).orElse(null);
+
+        if (loanRequest == null) {
+            log.error("Loan from queue doesn't exist");
+            return;
+        }
+
+        UserCredential borrower = userCredentialRepo.findByEmailAndRole(borrowerEmail, Roles.BORROWER).orElse(null);
+
+        if (borrower == null) {
+            log.error("Borrower from queue doesn't exist");
+            return;
+        }
 
         //finds relevant lenders on the basis of their last activity
         List<UserCredential> lenders = userCredentialRepo.findAllActiveLenders();
@@ -54,31 +66,38 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
         //if no relevant lender is found change the loan suggestion status to terminated and throw an exception
         if (lenders.isEmpty()) {
             //if loan request can't be suggested change its status
-            loanRequest.setSuggestionStatus(LoanSuggestionStatus.TERMINATED);
+            loanRequest.setLoanStatus(LoanStatus.TERMINATED);
+            borrower.setOngoingLoan(false);
             loanRequestRepo.save(loanRequest);
-            //haha i_am_teapot status cool laagyo ani throw gardiye
-            throw new AppException("Loan request of id " + loanRequestId + " can't be suggested to any lenders",
-                    HttpStatus.I_AM_A_TEAPOT);
+            userCredentialRepo.save(borrower);
+            log.error("Sorry, no lenders found. Loan request has been terminated");
+            return;
         }
 
         //save the loan request into loan suggestion table
         //by linking it with all the lenders one by one
         for (UserCredential lender : lenders) {
+
             LoanSuggestion loanSuggestion = new LoanSuggestion();
             loanSuggestion.setLoanRequest(loanRequest);
             loanSuggestion.setLender(lender);
+
             //try block is used to rollback previous savings into database if any error occurs
             try {
                 loanSuggestionRepo.save(loanSuggestion);
             } catch (Exception exception) {
                 //if loan request can't be suggested change its status
-                loanRequest.setSuggestionStatus(LoanSuggestionStatus.TERMINATED);
+                loanRequest.setLoanStatus(LoanStatus.TERMINATED);
+                borrower.setOngoingLoan(false);
                 loanRequestRepo.save(loanRequest);
-                throw new AppException("Loan Suggestion can't be created", HttpStatus.INTERNAL_SERVER_ERROR);
+                userCredentialRepo.save(borrower);
+                log.error("Loan Suggestion can't be created so loan has been terminated");
             }
+
         }
+
         //once the loan is suggested to lenders change its suggestion status to suggested and save it into database
-        loanRequest.setSuggestionStatus(LoanSuggestionStatus.SUGGESTED);
+        loanRequest.setLoanStatus(LoanStatus.SUGGESTED);
         loanRequestRepo.save(loanRequest);
     }
 

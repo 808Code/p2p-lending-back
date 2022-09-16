@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 public interface LoanSuggestionService {
     @Transactional
-    void save(UUID loanRequestId);
+    void save(UUID loanRequestId, String borrower);
 
     List<Map<String, Object>> findSuggestedLoansForLender(String email);
 }

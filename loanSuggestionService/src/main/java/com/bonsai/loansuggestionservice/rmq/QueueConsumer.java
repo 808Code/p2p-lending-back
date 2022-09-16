@@ -24,6 +24,6 @@ public class QueueConsumer {
         //proceed only if borrower is green otherwise terminate the process
 
         //let's assume borrower is green
-        loanSuggestionService.save(loanInQueue.id());
+        loanSuggestionService.save(loanInQueue.id(), borrower);
     }
 }
