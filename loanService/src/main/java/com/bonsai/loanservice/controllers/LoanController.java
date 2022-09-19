@@ -1,6 +1,8 @@
 package com.bonsai.loanservice.controllers;
 
+import com.bonsai.loanservice.dto.LendRequest;
 import com.bonsai.loanservice.dto.LoanResponse;
+import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.sharedservice.dtos.loan.LoanInQueue;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import com.bonsai.loanservice.dto.LoanRequestDto;
@@ -9,6 +11,7 @@ import com.bonsai.sharedservice.rmq.MessagingConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -26,6 +29,7 @@ public class LoanController {
 
     private final LoanService loanService;
     private final RabbitTemplate rabbitTemplate;
+    private final LendingService lendingService;
 
     @PostMapping("/createLoan")
     public ResponseEntity<SuccessResponse> createLoan(@Valid @RequestBody LoanRequestDto loanRequestDto) {
@@ -53,6 +57,14 @@ public class LoanController {
     public ResponseEntity<SuccessResponse> findAllLoanTypes() {
         return ResponseEntity.ok(
                 new SuccessResponse("Loan type list fetched successfully", loanService.findAllLoanTypes())
+        );
+    }
+
+    @PostMapping("/lend")
+    public ResponseEntity<SuccessResponse> lend(@Valid @RequestBody LendRequest lendRequest, Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(
+                new SuccessResponse("Amount lending successful", lendingService.lend(lendRequest, user))
         );
     }
 }
