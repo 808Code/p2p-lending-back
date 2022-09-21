@@ -1,5 +1,7 @@
 package com.bonsai.loanservice.models;
 
+import com.bonsai.accountservice.models.UserCredential;
+import com.bonsai.walletservice.models.WalletTransaction;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,8 +22,15 @@ public class LoanCollection {
     @OneToOne
     @JoinColumn(name = "loan_id", referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "FK_Loan_Collection_Loan"))
-    LoanRequest loanRequest;
+    private LoanRequest loanRequest;
 
-    @Column(name = "collected_amount")
-    private Long collectedAmount;
+    @OneToOne
+    @JoinColumn(name = "transaction_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "FK_Loan_Collection_Wallet_Transaction"))
+    private WalletTransaction walletTransaction;
+
+    @OneToOne
+    @JoinColumn(name = "lender_id", referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "FK_Loan_Collection_Lender"))
+    private UserCredential lender;
 }

@@ -80,7 +80,6 @@ public class LoanServiceImpl implements LoanService {
 
         LoanCollection loanCollection = LoanCollection.builder()
                 .loanRequest(loanRequest)
-                .collectedAmount(0L)
                 .build();
 
         collectionRepo.save(loanCollection);

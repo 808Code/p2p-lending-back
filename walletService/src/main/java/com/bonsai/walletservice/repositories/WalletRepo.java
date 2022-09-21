@@ -17,7 +17,7 @@ public interface WalletRepo extends JpaRepository<Wallet, UUID> {
     Wallet findByUserEmail(String email);
 
     @Query(nativeQuery = true, value = """
-            select w.amount as "toatalBalance",
+            select w.amount as "totalBalance",
                    (w.amount - coalesce(a."lockedBalance", 0)) as "availableBalance"
             from wallet w
                      inner join user_credential uc on uc.id = w.user_id and uc.email = ?1

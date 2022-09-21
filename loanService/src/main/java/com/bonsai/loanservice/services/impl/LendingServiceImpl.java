@@ -11,10 +11,6 @@ import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.sharedservice.exceptions.AppException;
-import com.bonsai.walletservice.constants.WalletTransactionTypes;
-import com.bonsai.walletservice.dtos.WithdrawRequest;
-import com.bonsai.walletservice.models.Wallet;
-import com.bonsai.walletservice.models.WalletTransaction;
 import com.bonsai.walletservice.repositories.WalletRepo;
 import com.bonsai.walletservice.repositories.WalletTransactionRepo;
 import com.bonsai.walletservice.services.WalletService;
@@ -23,8 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -41,6 +35,10 @@ public class LendingServiceImpl implements LendingService {
     @Override
     @Transactional
     public Long lend(LendRequest lendRequest, String lenderEmail) {
+
+        if (lendRequest.amount() % 5000 != 0) {
+            throw new AppException("Lending amount must be in the multiple of 5", HttpStatus.BAD_REQUEST);
+        }
 
         LoanRequest loanRequest = loanRepo.findById(UUID.fromString(lendRequest.loanId()))
                 .orElseThrow(() -> new AppException("Invalid loan Id", HttpStatus.BAD_REQUEST));
@@ -59,39 +57,30 @@ public class LendingServiceImpl implements LendingService {
         LoanCollection loanCollection = collectionRepo.findByLoanRequest_Id(loanRequest.getId())
                 .orElseThrow(() -> new AppException("No loan collection found", HttpStatus.INTERNAL_SERVER_ERROR));
 
-        Long amount = walletService.withdraw(new WithdrawRequest(lendRequest.amount(), "Lend amount to " + loanRequest.getBorrower().getEmail()), lenderEmail);
+        Long lenderWalletBalance = walletService.fetchBalanceFromWallet(lenderEmail).get("availableBalance").longValue();
 
-        loanCollection.setCollectedAmount(loanCollection.getCollectedAmount() + amount);
-        loanCollection = collectionRepo.saveAndFlush(loanCollection);
+        Long loanAmount = lendRequest.amount();
 
-        loanRequest.setRemainingAmount(loanRequest.getRemainingAmount() - amount);
-
-        if (loanCollection.getCollectedAmount() == loanRequest.getAmount()) {
-            loanRequest.setLoanStatus(LoanStatus.FULFILLED);
+        //does lender have enough amount to pay for the loan?
+        if (lenderWalletBalance < loanAmount) {
+            throw new AppException("Sorry, you have insufficient balance", HttpStatus.BAD_REQUEST);
         }
 
-        loanRequest = loanRepo.saveAndFlush(loanRequest);
+        //will loan be fulfilled?
 
-        Wallet lenderWallet = walletRepo.findByUserEmail(loanRequest.getBorrower().getEmail());
-        WalletTransaction walletTransaction = new WalletTransaction();
-        walletTransaction.setWallet(lenderWallet);
-        walletTransaction.setAmount(BigDecimal.valueOf(amount));
-        walletTransaction.setDate(LocalDateTime.now());
 
-        if (loanRequest.getLoanStatus().equals(LoanStatus.FULFILLED)) {
-            //release that amount from lenders wallet
-            walletService.loadWallet(loanCollection.getCollectedAmount(), loanRequest.getBorrower().getEmail());
-            walletTransaction.setType(WalletTransactionTypes.RELEASED);
-            walletTransaction.setRemarks("Amount Released for lending to " + loanRequest.getBorrower().getEmail());
+        //no = lender ko wallet baata amount locked state maa rakhne
+        //add amount to loan collection table (loan collecteion has lender and walletTransaction column)
 
-        } else {
-            //lock that amount in lenders wallet
-            walletTransaction.setType(WalletTransactionTypes.LOCKED);
-            walletTransaction.setRemarks("Amount Locked for lending to " + loanRequest.getBorrower().getEmail());
-        }
-        return amount;
+        //yes = lender ko wallet lai debit(amount) garne
+        //loan collection maa vaako lender ko chai transaction lai locked baata debit maa edit garne
+
+        //credit to borrower wallet
+        //update my lendings on the basis
+
+        //clear loan collection
+
+
+        return null;
     }
-
-    //borrower ko account maa paisa gayena
-    //5000 ko multiple maa matra hunu paryo lending amount
 }
