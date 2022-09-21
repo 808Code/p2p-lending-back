@@ -78,12 +78,6 @@ public class LoanServiceImpl implements LoanService {
 
         loanRequest = loanRequestRepo.saveAndFlush(loanRequest);
 
-        LoanCollection loanCollection = LoanCollection.builder()
-                .loanRequest(loanRequest)
-                .build();
-
-        collectionRepo.save(loanCollection);
-
         return new LoanResponse(loanRequest);
     }
 

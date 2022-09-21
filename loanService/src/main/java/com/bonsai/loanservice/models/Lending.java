@@ -38,7 +38,7 @@ public class Lending {
     )
     private WalletTransaction transaction;
 
-    @Column(name = "requested_date")
-    private LocalDateTime lendingDate;
+    @Column(name = "lent_date")
+    private LocalDateTime lentDate;
 
 }
