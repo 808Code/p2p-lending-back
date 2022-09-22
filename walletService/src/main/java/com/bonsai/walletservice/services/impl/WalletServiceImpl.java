@@ -1,5 +1,6 @@
 package com.bonsai.walletservice.services.impl;
 
+import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.Wallet;
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author Narendra
@@ -31,16 +33,21 @@ public class WalletServiceImpl implements WalletService {
     private final UserCredentialRepo userCredentialRepo;
     private final WalletTransactionRepo walletTransactionRepo;
 
+    @Override
+    public Wallet findUserWallet(String email) {
+        Wallet wallet = walletRepo.findByUserEmail(email);
+        if (wallet == null) {
+            throw new AppException("User not found", HttpStatus.BAD_REQUEST);
+        }
+        return wallet;
+    }
+
     @Transactional
     @Override
     public BigDecimal loadWallet(Long amount, String user) {
 
         //get the wallet of the given user
-        Wallet wallet = walletRepo.findByUserEmail(user);
-
-        if(wallet == null) {
-            throw new AppException("User of given email not found", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Wallet wallet = findUserWallet(user);
 
         //add amount to wallet
         wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
@@ -51,7 +58,7 @@ public class WalletServiceImpl implements WalletService {
         walletTransaction.setDate(LocalDateTime.now());
         walletTransaction.setAmount(BigDecimal.valueOf(amount));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
-        walletTransaction.setRemarks("Amount Loaded into wallet");
+        walletTransaction.setRemarks("Rs. " + amount + " credited into wallet.");
 
         //save updated wallet into database
         walletRepo.save(wallet);
@@ -60,13 +67,68 @@ public class WalletServiceImpl implements WalletService {
 
         return wallet.getAmount();
     }
+
     @Override
     public Map<String, BigDecimal> fetchBalanceFromWallet(String email) {
-        return walletRepo.fetchBalanceFromWallet(email);
+        UserCredential userCredential = userCredentialRepo.findByEmail(email)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.BAD_REQUEST));
+        return walletRepo.fetchBalanceFromWallet(userCredential.getEmail());
     }
 
     @Override
     public List<Map<String, Object>> findAllTransactionsByUserEmail(String email) {
-        return walletTransactionRepo.findAllTransactionsByUserEmail(email);
+        UserCredential userCredential = userCredentialRepo.findByEmail(email)
+                .orElseThrow(() -> new AppException("User not found", HttpStatus.BAD_REQUEST));
+        return walletTransactionRepo.findAllTransactionsByUserEmail(userCredential.getEmail());
     }
+
+    @Override
+    public UUID debitOrLockAmount(String transactionType, Long amount, String userEmail) {
+
+        transactionType = transactionType.toUpperCase();
+
+        //if transaction type is neither DEBIT nor LOCKED, throw an exception
+        if (!transactionType.equals(WalletTransactionTypes.DEBIT)
+                && !transactionType.equals(WalletTransactionTypes.LOCKED)) {
+            throw new AppException("Transaction type invalid", HttpStatus.BAD_REQUEST);
+        }
+
+        //get the wallet of the given user
+        Wallet wallet = findUserWallet(userEmail);
+
+        //check whether user's balance is sufficient or not
+        if (!isBalanceSufficient(userEmail, BigDecimal.valueOf(amount))) {
+            throw new AppException("Sorry, your balance is insufficient", HttpStatus.BAD_REQUEST);
+        }
+
+        //build transaction for this operation
+        WalletTransaction walletTransaction = new WalletTransaction();
+        walletTransaction.setWallet(wallet);
+        walletTransaction.setDate(LocalDateTime.now());
+        walletTransaction.setAmount(BigDecimal.valueOf(amount));
+        walletTransaction.setType(transactionType);
+        walletTransaction.setRemarks(
+                transactionType.equals(WalletTransactionTypes.DEBIT)
+                        ? "Rs. " + amount + " debited from wallet."
+                        : "Rs. " + amount + " locked in wallet."
+        );
+
+        //subtract amount from wallet if transaction type is DEBIT
+        if (transactionType.equals(WalletTransactionTypes.DEBIT)) {
+            wallet.setAmount(wallet.getAmount().subtract(BigDecimal.valueOf(amount)));
+            walletRepo.saveAndFlush(wallet);
+        }
+
+        //create new transaction and save it into database
+        walletTransaction = walletTransactionRepo.saveAndFlush(walletTransaction);
+
+        return walletTransaction.getId();
+    }
+
+    @Override
+    public Boolean isBalanceSufficient(String userEmail, BigDecimal amount) {
+        Long availableBalance = fetchBalanceFromWallet(userEmail).get("availableBalance").longValue();
+        return (availableBalance > amount.longValue()) || (availableBalance == amount.longValue());
+    }
+
 }

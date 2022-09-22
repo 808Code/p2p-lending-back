@@ -66,7 +66,7 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
         //if no relevant lender is found change the loan suggestion status to terminated and throw an exception
         if (lenders.isEmpty()) {
             //if loan request can't be suggested change its status
-            loanRequest.setLoanStatus(LoanStatus.TERMINATED);
+            loanRequest.setLoanStatus(LoanStatus.REJECTED);
             borrower.setOngoingLoan(false);
             loanRequestRepo.save(loanRequest);
             userCredentialRepo.save(borrower);
@@ -87,7 +87,7 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
                 loanSuggestionRepo.save(loanSuggestion);
             } catch (Exception exception) {
                 //if loan request can't be suggested change its status
-                loanRequest.setLoanStatus(LoanStatus.TERMINATED);
+                loanRequest.setLoanStatus(LoanStatus.REJECTED);
                 borrower.setOngoingLoan(false);
                 loanRequestRepo.save(loanRequest);
                 userCredentialRepo.save(borrower);

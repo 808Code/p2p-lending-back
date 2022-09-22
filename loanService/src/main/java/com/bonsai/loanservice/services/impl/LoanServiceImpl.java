@@ -8,7 +8,9 @@ import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
+import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
+import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.exceptions.AppException;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,10 @@ public class LoanServiceImpl implements LoanService {
 
     private final UserCredentialRepo userCredentialRepo;
 
+    private final LoanCollectionRepo collectionRepo;
+
     @Override
+    @Transactional
     public LoanResponse save(LoanRequestDto loanRequestDto) {
 
         UserCredential borrower = userCredentialRepo.findByEmailAndRole(loanRequestDto.borrower(), Roles.BORROWER).orElseThrow(
@@ -69,7 +75,10 @@ public class LoanServiceImpl implements LoanService {
 
         borrower.setOngoingLoan(true);
         userCredentialRepo.save(borrower);
-        return new LoanResponse(loanRequestRepo.save(loanRequest));
+
+        loanRequest = loanRequestRepo.saveAndFlush(loanRequest);
+
+        return new LoanResponse(loanRequest);
     }
 
     @Override
