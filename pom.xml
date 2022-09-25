@@ -28,6 +28,7 @@
         <module>sharedService</module>
         <module>loanSuggestionService</module>
         <module>walletService</module>
+        <module>repaymentService</module>
     </modules>
 
     <dependencies>
