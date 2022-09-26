@@ -5,9 +5,12 @@ import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.dto.LendRequest;
+import com.bonsai.loanservice.dto.LendingResponse;
 import com.bonsai.loanservice.models.Lending;
+import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LendingRepo;
+import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
@@ -23,6 +26,8 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,6 +40,7 @@ public class LendingServiceImpl implements LendingService {
     private final WalletTransactionRepo transactionRepo;
     private final LoanCollectionService loanCollectionService;
     private final LendingRepo lendingRepo;
+    private final LoanCollectionRepo loanCollectionRepo;
 
     @Override
     @Transactional
@@ -131,6 +137,18 @@ public class LendingServiceImpl implements LendingService {
 
         lending = lendingRepo.saveAndFlush(lending);
         return lending.getId();
+    }
+
+    @Override
+    public List<LendingResponse> fetchLendings(String lenderEmail) {
+        List<LendingResponse> response = new ArrayList<>();
+
+        List<Lending> lendings = lendingRepo.findAllByLender_Email(lenderEmail);
+        List<LoanCollection> loanCollectionList = loanCollectionRepo.findAllByLender_Email(lenderEmail);
+
+        lendings.stream().forEach(lending -> response.add(new LendingResponse(lending)));
+        loanCollectionList.stream().forEach(collection -> response.add(new LendingResponse(collection)));
+        return response;
     }
 
 }
