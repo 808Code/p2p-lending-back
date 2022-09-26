@@ -11,6 +11,8 @@ import com.bonsai.loanservice.repositories.LendingRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.repaymentservice.dto.InstallmentDto;
+import com.bonsai.repaymentservice.services.InstallmentService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.WalletTransaction;
@@ -19,9 +21,9 @@ import com.bonsai.walletservice.services.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -35,6 +37,7 @@ public class LendingServiceImpl implements LendingService {
     private final WalletTransactionRepo transactionRepo;
     private final LoanCollectionService loanCollectionService;
     private final LendingRepo lendingRepo;
+    private final InstallmentService installmentService;
 
     @Override
     @Transactional
@@ -103,6 +106,20 @@ public class LendingServiceImpl implements LendingService {
         Long newCollectedAmount = loanCollectionService.getLoanCollectionAmount(loanRequest.getId());
         walletService.loadWallet(newCollectedAmount, loanRequest.getBorrower().getEmail());
 
+        BigDecimal emi = installmentService.getEmi(loanRequest.getAmount(),loanRequest.getDuration(),12);
+        LocalDate localDateNow=LocalDate.now();
+        for(int i = 1; i <= loanRequest.getDuration(); i++) {
+            localDateNow = localDateNow.plusDays(30);
+            installmentService.saveInstallment(
+                    new InstallmentDto(
+                            loanRequest.getId(),
+                            i,
+                            emi,
+                            localDateNow,
+                            "UNPAID"
+                    )
+            );
+        }
         //clear loan collection after loan is fulfilled
         loanCollectionService.deleteAllByLoanRequestId(loanRequest.getId());
 
