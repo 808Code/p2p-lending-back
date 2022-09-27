@@ -8,7 +8,6 @@ import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.constants.LoanType;
 import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
-import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
@@ -36,8 +35,6 @@ public class LoanServiceImpl implements LoanService {
     private final LoanRequestRepo loanRequestRepo;
 
     private final UserCredentialRepo userCredentialRepo;
-
-    private final LoanCollectionRepo collectionRepo;
 
     @Override
     @Transactional
@@ -106,5 +103,15 @@ public class LoanServiceImpl implements LoanService {
         loanTypes.add(LoanType.HOME);
         loanTypes.add(LoanType.BUSINESS);
         return loanTypes;
+    }
+
+    @Override
+    @Transactional
+    public void deleteLoanSuggestion(UUID loanId, String lenderEmail) {
+        try{
+            loanRequestRepo.clearLoanSuggestion(loanId, lenderEmail);
+        }catch (Exception exception) {
+            throw new AppException(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

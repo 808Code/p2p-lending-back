@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public interface LendingRepo extends JpaRepository<Lending, UUID> {
@@ -16,4 +17,5 @@ public interface LendingRepo extends JpaRepository<Lending, UUID> {
             values (?1, ?2, ?3, ?4, ?5);
             """)
     void createLending(UUID id, LocalDateTime lentDate, UUID lenderId, UUID loanRequestId, UUID transactionId);
+    List<Lending> findAllByLender_Email(String email);
 }

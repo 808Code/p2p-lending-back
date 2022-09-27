@@ -9,5 +9,5 @@ public class LoanStatus {
     public static final String NEW = "NEW";
     public static final String SUGGESTED = "SUGGESTED";
     public static final String REJECTED = "REJECTED";
-    public static final String FULFILLED = "FULFILLED";
+    public static final String ONGOING = "ONGOING";
 }

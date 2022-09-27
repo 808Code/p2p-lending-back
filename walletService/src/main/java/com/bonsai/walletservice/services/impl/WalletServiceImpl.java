@@ -37,14 +37,14 @@ public class WalletServiceImpl implements WalletService {
     public Wallet findUserWallet(String email) {
         Wallet wallet = walletRepo.findByUserEmail(email);
         if (wallet == null) {
-            throw new AppException("User not found", HttpStatus.BAD_REQUEST);
+            throw new AppException("Wallet not found", HttpStatus.BAD_REQUEST);
         }
         return wallet;
     }
 
     @Transactional
     @Override
-    public BigDecimal loadWallet(Long amount, String user) {
+    public BigDecimal loadWallet(Long amount, String user, String remarks) {
 
         //get the wallet of the given user
         Wallet wallet = findUserWallet(user);
@@ -58,7 +58,7 @@ public class WalletServiceImpl implements WalletService {
         walletTransaction.setDate(LocalDateTime.now());
         walletTransaction.setAmount(BigDecimal.valueOf(amount));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
-        walletTransaction.setRemarks("Rs. " + amount + " credited into wallet.");
+        walletTransaction.setRemarks(remarks);
 
         //save updated wallet into database
         walletRepo.save(wallet);

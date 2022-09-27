@@ -18,4 +18,6 @@ public interface LoanCollectionRepo extends JpaRepository<LoanCollection, UUID> 
     List<LoanCollection> findAllByLoanRequestId(UUID id);
 
     void deleteAllByLoanRequestId(UUID id);
+
+    List<LoanCollection> findAllByLender_Email(String email);
 }

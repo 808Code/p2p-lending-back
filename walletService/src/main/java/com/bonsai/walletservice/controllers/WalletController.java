@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
 /**
  * @author Narendra
  * @version 1.0
@@ -27,8 +28,10 @@ public class WalletController {
                                                       Authentication authentication) {
         String user = (String) authentication.getPrincipal();
         return ResponseEntity.ok(new SuccessResponse("Balance load successful",
-                walletService.loadWallet(loadWalletRequest.amount(), user)));
+                walletService.loadWallet(loadWalletRequest.amount(), user,
+                        "Rs. " + loadWalletRequest.amount() + " credited into wallet")));
     }
+
     @GetMapping("/getBalance")
     public ResponseEntity<SuccessResponse> getWalletBalance(Authentication authentication) {
         String user = (String) authentication.getPrincipal();

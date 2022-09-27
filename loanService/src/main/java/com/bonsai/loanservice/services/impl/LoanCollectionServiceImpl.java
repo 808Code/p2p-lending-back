@@ -70,7 +70,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
                 .orElseThrow(() -> new AppException("Invalid loan id", HttpStatus.BAD_REQUEST));
 
         //if loan request is already fulfilled we can't process further
-        if (loanRequest.getLoanStatus().equals(LoanStatus.FULFILLED)) {
+        if (loanRequest.getLoanStatus().equals(LoanStatus.ONGOING)) {
             throw new AppException("Loan is already fulfilled", HttpStatus.BAD_REQUEST);
         }
 
@@ -93,6 +93,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
                 Wallet wallet = transaction.getWallet();
                 wallet.setAmount(wallet.getAmount().subtract(transaction.getAmount()));
                 transaction.setType(WalletTransactionTypes.DEBIT);
+                transaction.setRemarks("Rs. " + transaction.getAmount() + " debited from wallet.");
 
                 //create lending whenever there occurs a "DEBIT" instantly
                 //using lending service gave rise to circular dependency issue so, repo was used
@@ -114,7 +115,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
             }
         }
         //set loan status to "FULFILLED"
-        loanRequest.setLoanStatus(LoanStatus.FULFILLED);
+        loanRequest.setLoanStatus(LoanStatus.ONGOING);
         loanRequest.setRemainingAmount(0L);
         loanRequest = loanRequestRepo.saveAndFlush(loanRequest);
         return loanRequest.getId();

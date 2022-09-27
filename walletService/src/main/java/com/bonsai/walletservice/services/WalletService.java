@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public interface WalletService {
     Wallet findUserWallet(String email);
-    BigDecimal loadWallet(Long amount, String user);
+    BigDecimal loadWallet(Long amount, String user, String remarks);
     Map<String, BigDecimal> fetchBalanceFromWallet(String email);
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
     UUID debitOrLockAmount(String transactionType, Long amount, String userEmail);
