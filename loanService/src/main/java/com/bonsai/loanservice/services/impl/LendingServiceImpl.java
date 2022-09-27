@@ -90,7 +90,7 @@ public class LendingServiceImpl implements LendingService {
             UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, lendingAmount, lenderEmail);
             loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
 
-            loanRequest.setRemainingAmount(loanRequest.getRemainingAmount()-lendingAmount);
+            loanRequest.setRemainingAmount(loanRequest.getRemainingAmount() - lendingAmount);
             loanRepo.save(loanRequest);
 
             //clear loan suggestion
@@ -115,7 +115,9 @@ public class LendingServiceImpl implements LendingService {
 
         //credit to borrower wallet after loan is fulfilled
         Long newCollectedAmount = loanCollectionService.getLoanCollectionAmount(loanRequest.getId());
-        walletService.loadWallet(newCollectedAmount, loanRequest.getBorrower().getEmail());
+        walletService.loadWallet(newCollectedAmount,
+                loanRequest.getBorrower().getEmail(),
+                "Loan amount credited into wallet");
 
         //clear loan collection after loan is fulfilled
         loanCollectionService.deleteAllByLoanRequestId(loanRequest.getId());
@@ -128,13 +130,13 @@ public class LendingServiceImpl implements LendingService {
     public UUID createLending(LocalDateTime lentDate, String lenderEmail, UUID loanRequestId, UUID transactionId) {
 
         UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
-                .orElseThrow(()-> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
 
         LoanRequest loanRequest = loanRepo.findById(loanRequestId)
-                .orElseThrow(()-> new AppException("Loan request not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Loan request not found", HttpStatus.BAD_REQUEST));
 
         WalletTransaction transaction = transactionRepo.findById(transactionId)
-                .orElseThrow(()-> new AppException("Wallet transaction not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Wallet transaction not found", HttpStatus.BAD_REQUEST));
 
         Lending lending = Lending.builder()
                 .lentDate(lentDate)

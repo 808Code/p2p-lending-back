@@ -44,7 +44,7 @@ public class WalletServiceImpl implements WalletService {
 
     @Transactional
     @Override
-    public BigDecimal loadWallet(Long amount, String user) {
+    public BigDecimal loadWallet(Long amount, String user, String remarks) {
 
         //get the wallet of the given user
         Wallet wallet = findUserWallet(user);
@@ -58,7 +58,7 @@ public class WalletServiceImpl implements WalletService {
         walletTransaction.setDate(LocalDateTime.now());
         walletTransaction.setAmount(BigDecimal.valueOf(amount));
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
-        walletTransaction.setRemarks("Rs. " + amount + " credited into wallet.");
+        walletTransaction.setRemarks(remarks);
 
         //save updated wallet into database
         walletRepo.save(wallet);
