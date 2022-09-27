@@ -58,7 +58,7 @@ public class LendingServiceImpl implements LendingService {
                 .orElseThrow(() -> new AppException("Invalid loan Id", HttpStatus.BAD_REQUEST));
 
         //lenders can't lend amount to already fulfilled loan
-        if (loanRequest.getLoanStatus().equals(LoanStatus.FULFILLED)) {
+        if (loanRequest.getLoanStatus().equals(LoanStatus.ONGOING)) {
             throw new AppException("Loan has already been fulfilled", HttpStatus.BAD_REQUEST);
         }
 

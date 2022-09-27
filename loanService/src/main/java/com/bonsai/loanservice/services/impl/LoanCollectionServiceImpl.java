@@ -70,7 +70,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
                 .orElseThrow(() -> new AppException("Invalid loan id", HttpStatus.BAD_REQUEST));
 
         //if loan request is already fulfilled we can't process further
-        if (loanRequest.getLoanStatus().equals(LoanStatus.FULFILLED)) {
+        if (loanRequest.getLoanStatus().equals(LoanStatus.ONGOING)) {
             throw new AppException("Loan is already fulfilled", HttpStatus.BAD_REQUEST);
         }
 
@@ -115,7 +115,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
             }
         }
         //set loan status to "FULFILLED"
-        loanRequest.setLoanStatus(LoanStatus.FULFILLED);
+        loanRequest.setLoanStatus(LoanStatus.ONGOING);
         loanRequest.setRemainingAmount(0L);
         loanRequest = loanRequestRepo.saveAndFlush(loanRequest);
         return loanRequest.getId();
