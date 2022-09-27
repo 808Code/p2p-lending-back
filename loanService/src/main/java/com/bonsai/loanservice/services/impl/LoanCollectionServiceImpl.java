@@ -93,6 +93,7 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
                 Wallet wallet = transaction.getWallet();
                 wallet.setAmount(wallet.getAmount().subtract(transaction.getAmount()));
                 transaction.setType(WalletTransactionTypes.DEBIT);
+                transaction.setRemarks("Rs. " + transaction.getAmount() + " debited from wallet.");
 
                 //create lending whenever there occurs a "DEBIT" instantly
                 //using lending service gave rise to circular dependency issue so, repo was used
