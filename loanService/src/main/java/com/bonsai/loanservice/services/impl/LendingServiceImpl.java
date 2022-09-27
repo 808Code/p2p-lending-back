@@ -14,6 +14,7 @@ import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.WalletTransaction;
@@ -41,6 +42,7 @@ public class LendingServiceImpl implements LendingService {
     private final LoanCollectionService loanCollectionService;
     private final LendingRepo lendingRepo;
     private final LoanCollectionRepo loanCollectionRepo;
+    private final LoanService loanService;
 
     @Override
     @Transactional
@@ -91,6 +93,9 @@ public class LendingServiceImpl implements LendingService {
             loanRequest.setRemainingAmount(loanRequest.getRemainingAmount()-lendingAmount);
             loanRepo.save(loanRequest);
 
+            //clear loan suggestion
+            loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
+
             return lendRequest.amount();
         }
 
@@ -99,6 +104,9 @@ public class LendingServiceImpl implements LendingService {
         loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
         //create lending whenever there occurs a "DEBIT" instantly
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
+
+        //clear loan suggestion
+        loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
 
         //change the type of transaction from "LOCKED" to "DEBIT" in all the loanCollections
         //also deduct that "DEBIT" amount from lender's wallet

@@ -18,4 +18,5 @@ public interface LoanService {
     List<LoanResponse> findAllByBorrower(String borrowerEmail);
 
     List<String> findAllLoanTypes();
+    void deleteLoanSuggestion(UUID loanId, String lenderEmail);
 }
