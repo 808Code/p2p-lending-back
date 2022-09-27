@@ -11,6 +11,7 @@ import com.bonsai.loanservice.repositories.LendingRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.repaymentservice.constants.InstallmentStatus;
 import com.bonsai.repaymentservice.dto.InstallmentDto;
 import com.bonsai.repaymentservice.services.InstallmentService;
 import com.bonsai.sharedservice.exceptions.AppException;
@@ -116,7 +117,7 @@ public class LendingServiceImpl implements LendingService {
                             i,
                             emi,
                             localDateNow,
-                            "UNPAID"
+                            InstallmentStatus.UNPAID
                     )
             );
         }
