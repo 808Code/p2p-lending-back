@@ -37,7 +37,7 @@ public class WalletServiceImpl implements WalletService {
     public Wallet findUserWallet(String email) {
         Wallet wallet = walletRepo.findByUserEmail(email);
         if (wallet == null) {
-            throw new AppException("User not found", HttpStatus.BAD_REQUEST);
+            throw new AppException("Wallet not found", HttpStatus.BAD_REQUEST);
         }
         return wallet;
     }
