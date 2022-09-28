@@ -83,7 +83,7 @@ public class LendingServiceImpl implements LendingService {
         //add amount to loan collection table by keeping the locked transaction
         if (!futureCollectionAmount.equals(loanRequest.getAmount())) {
 
-            UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, lendingAmount, lenderEmail);
+            UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, BigDecimal.valueOf(lendingAmount), lenderEmail);
             loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
 
             loanRequest.setRemainingAmount(loanRequest.getRemainingAmount()-lendingAmount);
@@ -93,7 +93,7 @@ public class LendingServiceImpl implements LendingService {
         }
 
         //yes = lender ko wallet lai debit(amount) garne
-        UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.DEBIT, lendingAmount, lenderEmail);
+        UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.DEBIT, BigDecimal.valueOf(lendingAmount), lenderEmail);
         loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
         //create lending whenever there occurs a "DEBIT" instantly
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
