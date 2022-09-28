@@ -14,6 +14,9 @@ import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.repaymentservice.constants.InstallmentStatus;
+import com.bonsai.repaymentservice.dto.InstallmentDto;
+import com.bonsai.repaymentservice.services.InstallmentService;
 import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
@@ -23,9 +26,9 @@ import com.bonsai.walletservice.services.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +44,7 @@ public class LendingServiceImpl implements LendingService {
     private final WalletTransactionRepo transactionRepo;
     private final LoanCollectionService loanCollectionService;
     private final LendingRepo lendingRepo;
+    private final InstallmentService installmentService;
     private final LoanCollectionRepo loanCollectionRepo;
     private final LoanService loanService;
 
@@ -87,7 +91,7 @@ public class LendingServiceImpl implements LendingService {
         //add amount to loan collection table by keeping the locked transaction
         if (!futureCollectionAmount.equals(loanRequest.getAmount())) {
 
-            UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, lendingAmount, lenderEmail);
+            UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, BigDecimal.valueOf(lendingAmount), lenderEmail);
             loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
 
             loanRequest.setRemainingAmount(loanRequest.getRemainingAmount() - lendingAmount);
@@ -100,7 +104,7 @@ public class LendingServiceImpl implements LendingService {
         }
 
         //yes = lender ko wallet lai debit(amount) garne
-        UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.DEBIT, lendingAmount, lenderEmail);
+        UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.DEBIT, BigDecimal.valueOf(lendingAmount), lenderEmail);
         loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
         //create lending whenever there occurs a "DEBIT" instantly
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
@@ -119,6 +123,20 @@ public class LendingServiceImpl implements LendingService {
                 loanRequest.getBorrower().getEmail(),
                 "Loan amount credited into wallet");
 
+        BigDecimal emi = installmentService.getEmi(loanRequest.getAmount(),loanRequest.getDuration(),12);
+        LocalDate localDateNow=LocalDate.now();
+        for(int i = 1; i <= loanRequest.getDuration(); i++) {
+            localDateNow = localDateNow.plusDays(30);
+            installmentService.saveInstallment(
+                    new InstallmentDto(
+                            loanRequest.getId(),
+                            i,
+                            emi,
+                            localDateNow,
+                            InstallmentStatus.UNPAID
+                    )
+            );
+        }
         //clear loan collection after loan is fulfilled
         loanCollectionService.deleteAllByLoanRequestId(loanRequest.getId());
 

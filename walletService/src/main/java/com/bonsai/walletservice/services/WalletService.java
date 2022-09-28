@@ -19,6 +19,6 @@ public interface WalletService {
     BigDecimal loadWallet(Long amount, String user, String remarks);
     Map<String, BigDecimal> fetchBalanceFromWallet(String email);
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
-    UUID debitOrLockAmount(String transactionType, Long amount, String userEmail);
+    UUID debitOrLockAmount(String transactionType, BigDecimal amount, String userEmail);
     Boolean isBalanceSufficient(String user, BigDecimal amount);
 }
