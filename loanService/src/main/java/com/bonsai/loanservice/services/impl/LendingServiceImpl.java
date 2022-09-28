@@ -5,15 +5,19 @@ import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.dto.LendRequest;
+import com.bonsai.loanservice.dto.LendingResponse;
 import com.bonsai.loanservice.models.Lending;
+import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
 import com.bonsai.loanservice.repositories.LendingRepo;
+import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
 import com.bonsai.repaymentservice.constants.InstallmentStatus;
 import com.bonsai.repaymentservice.dto.InstallmentDto;
 import com.bonsai.repaymentservice.services.InstallmentService;
+import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.WalletTransaction;
@@ -26,6 +30,8 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -39,6 +45,8 @@ public class LendingServiceImpl implements LendingService {
     private final LoanCollectionService loanCollectionService;
     private final LendingRepo lendingRepo;
     private final InstallmentService installmentService;
+    private final LoanCollectionRepo loanCollectionRepo;
+    private final LoanService loanService;
 
     @Override
     @Transactional
@@ -54,7 +62,7 @@ public class LendingServiceImpl implements LendingService {
                 .orElseThrow(() -> new AppException("Invalid loan Id", HttpStatus.BAD_REQUEST));
 
         //lenders can't lend amount to already fulfilled loan
-        if (loanRequest.getLoanStatus().equals(LoanStatus.FULFILLED)) {
+        if (loanRequest.getLoanStatus().equals(LoanStatus.ONGOING)) {
             throw new AppException("Loan has already been fulfilled", HttpStatus.BAD_REQUEST);
         }
 
@@ -86,8 +94,11 @@ public class LendingServiceImpl implements LendingService {
             UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.LOCKED, BigDecimal.valueOf(lendingAmount), lenderEmail);
             loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
 
-            loanRequest.setRemainingAmount(loanRequest.getRemainingAmount()-lendingAmount);
+            loanRequest.setRemainingAmount(loanRequest.getRemainingAmount() - lendingAmount);
             loanRepo.save(loanRequest);
+
+            //clear loan suggestion
+            loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
 
             return lendRequest.amount();
         }
@@ -98,6 +109,9 @@ public class LendingServiceImpl implements LendingService {
         //create lending whenever there occurs a "DEBIT" instantly
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
 
+        //clear loan suggestion
+        loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
+
         //change the type of transaction from "LOCKED" to "DEBIT" in all the loanCollections
         //also deduct that "DEBIT" amount from lender's wallet
         //update lending table accordingly for all the lenders
@@ -105,7 +119,9 @@ public class LendingServiceImpl implements LendingService {
 
         //credit to borrower wallet after loan is fulfilled
         Long newCollectedAmount = loanCollectionService.getLoanCollectionAmount(loanRequest.getId());
-        walletService.loadWallet(newCollectedAmount, loanRequest.getBorrower().getEmail());
+        walletService.loadWallet(newCollectedAmount,
+                loanRequest.getBorrower().getEmail(),
+                "Loan amount credited into wallet");
 
         BigDecimal emi = installmentService.getEmi(loanRequest.getAmount(),loanRequest.getDuration(),12);
         LocalDate localDateNow=LocalDate.now();
@@ -132,13 +148,13 @@ public class LendingServiceImpl implements LendingService {
     public UUID createLending(LocalDateTime lentDate, String lenderEmail, UUID loanRequestId, UUID transactionId) {
 
         UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
-                .orElseThrow(()-> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
 
         LoanRequest loanRequest = loanRepo.findById(loanRequestId)
-                .orElseThrow(()-> new AppException("Loan request not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Loan request not found", HttpStatus.BAD_REQUEST));
 
         WalletTransaction transaction = transactionRepo.findById(transactionId)
-                .orElseThrow(()-> new AppException("Wallet transaction not found", HttpStatus.BAD_REQUEST));
+                .orElseThrow(() -> new AppException("Wallet transaction not found", HttpStatus.BAD_REQUEST));
 
         Lending lending = Lending.builder()
                 .lentDate(lentDate)
@@ -149,6 +165,18 @@ public class LendingServiceImpl implements LendingService {
 
         lending = lendingRepo.saveAndFlush(lending);
         return lending.getId();
+    }
+
+    @Override
+    public List<LendingResponse> fetchLendings(String lenderEmail) {
+        List<LendingResponse> response = new ArrayList<>();
+
+        List<Lending> lendings = lendingRepo.findAllByLender_Email(lenderEmail);
+        List<LoanCollection> loanCollectionList = loanCollectionRepo.findAllByLender_Email(lenderEmail);
+
+        lendings.stream().forEach(lending -> response.add(new LendingResponse(lending)));
+        loanCollectionList.stream().forEach(collection -> response.add(new LendingResponse(collection)));
+        return response;
     }
 
 }
