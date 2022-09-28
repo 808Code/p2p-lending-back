@@ -83,7 +83,7 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public UUID debitOrLockAmount(String transactionType, Long amount, String userEmail) {
+    public UUID debitOrLockAmount(String transactionType, BigDecimal amount, String userEmail) {
 
         transactionType = transactionType.toUpperCase();
 
@@ -97,7 +97,7 @@ public class WalletServiceImpl implements WalletService {
         Wallet wallet = findUserWallet(userEmail);
 
         //check whether user's balance is sufficient or not
-        if (!isBalanceSufficient(userEmail, BigDecimal.valueOf(amount))) {
+        if (!isBalanceSufficient(userEmail, amount)) {
             throw new AppException("Sorry, your balance is insufficient", HttpStatus.BAD_REQUEST);
         }
 
@@ -105,7 +105,7 @@ public class WalletServiceImpl implements WalletService {
         WalletTransaction walletTransaction = new WalletTransaction();
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDateTime.now());
-        walletTransaction.setAmount(BigDecimal.valueOf(amount));
+        walletTransaction.setAmount(amount);
         walletTransaction.setType(transactionType);
         walletTransaction.setRemarks(
                 transactionType.equals(WalletTransactionTypes.DEBIT)
@@ -115,7 +115,7 @@ public class WalletServiceImpl implements WalletService {
 
         //subtract amount from wallet if transaction type is DEBIT
         if (transactionType.equals(WalletTransactionTypes.DEBIT)) {
-            wallet.setAmount(wallet.getAmount().subtract(BigDecimal.valueOf(amount)));
+            wallet.setAmount(wallet.getAmount().subtract(amount));
             walletRepo.saveAndFlush(wallet);
         }
 
@@ -127,8 +127,8 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     public Boolean isBalanceSufficient(String userEmail, BigDecimal amount) {
-        Long availableBalance = fetchBalanceFromWallet(userEmail).get("availableBalance").longValue();
-        return (availableBalance > amount.longValue()) || (availableBalance == amount.longValue());
+        BigDecimal availableBalance = fetchBalanceFromWallet(userEmail).get("availableBalance");
+        return (availableBalance.compareTo(amount) > 0) || (availableBalance.equals(amount));
     }
 
 }
