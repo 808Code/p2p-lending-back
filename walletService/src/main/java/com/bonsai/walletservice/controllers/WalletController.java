@@ -1,6 +1,7 @@
 package com.bonsai.walletservice.controllers;
 
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
+import com.bonsai.walletservice.dtos.LoadWalletDto;
 import com.bonsai.walletservice.dtos.LoadWalletRequest;
 import com.bonsai.walletservice.services.WalletService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 
 /**
  * @author Narendra
@@ -27,9 +29,11 @@ public class WalletController {
     public ResponseEntity<SuccessResponse> loadAmount(@Valid @RequestBody LoadWalletRequest loadWalletRequest,
                                                       Authentication authentication) {
         String user = (String) authentication.getPrincipal();
+        LoadWalletDto loadWalletDto = walletService.loadWallet(BigDecimal.valueOf(loadWalletRequest.amount()), user,
+                "Rs. " + loadWalletRequest.amount() + " credited into wallet");
         return ResponseEntity.ok(new SuccessResponse("Balance load successful",
-                walletService.loadWallet(loadWalletRequest.amount(), user,
-                        "Rs. " + loadWalletRequest.amount() + " credited into wallet")));
+                loadWalletDto.amount()
+                ));
     }
 
     @GetMapping("/getBalance")
