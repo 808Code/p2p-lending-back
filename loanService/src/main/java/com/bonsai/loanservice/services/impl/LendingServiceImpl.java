@@ -124,7 +124,7 @@ public class LendingServiceImpl implements LendingService {
                 loanRequest.getBorrower().getEmail(),
                 "Loan amount credited into wallet");
 
-        BigDecimal emi = installmentService.getEmi(loanRequest.getAmount(),loanRequest.getDuration(), InterestRate.BORROWER_INTEREST);
+        BigDecimal emi = installmentService.calculateMonthlyEMI(loanRequest.getAmount(),loanRequest.getDuration(), InterestRate.BORROWER_INTEREST);
         LocalDate localDateNow=LocalDate.now();
         for(int i = 1; i <= loanRequest.getDuration(); i++) {
             localDateNow = localDateNow.plusDays(30);

@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -53,9 +50,11 @@ public class InstallmentServiceImpl implements InstallmentService {
     }
 
     @Override
-    public BigDecimal getEmi(long principal, int duration_in_months, float rate_yearly) {
-        BigDecimal emi = BigDecimal.valueOf((principal * duration_in_months * 1.0 * rate_yearly / 1200) + (principal * 1.0 / duration_in_months));
-        return emi;
+    public BigDecimal calculateMonthlyEMI(long principal, int durationInMonths, float rateYearly) {
+        double monthlyInterest =  principal * 1.0 * rateYearly / 1200;
+        double monthlyPrincipal = principal * 1.0 / durationInMonths;
+
+        return BigDecimal.valueOf(monthlyInterest + monthlyPrincipal);
 
 
     }
@@ -114,7 +113,7 @@ public class InstallmentServiceImpl implements InstallmentService {
     public InstallmentsResponseDto getInstallments(GetInstallmentsDto getInstallmentsDto) {
         List<Installment> installments = installmentRepo.findAllByLoanRequest(UUID.fromString(getInstallmentsDto.loanId()));
         List<Installment> paidInstallment = new ArrayList<>();
-        List<Installment> unpaidInstallment = new ArrayList<>();
+        Installment upcomingInstallment = null;
         List<Installment> missedInstallment = new ArrayList<>();
         for (Installment installment : installments) {
             if (installment.getStatus().equals(InstallmentStatus.PAID)) {
@@ -122,14 +121,14 @@ public class InstallmentServiceImpl implements InstallmentService {
             } else if ((installment.getScheduledDate()).isBefore(LocalDate.now())) {
                 missedInstallment.add(installment);
             } else {
-                unpaidInstallment.add(installment);
+                if(upcomingInstallment == null || installment.getScheduledDate().isBefore(upcomingInstallment.getScheduledDate())){
+                    upcomingInstallment = installment;
+                }
             }
 
         }
 
-
-        InstallmentsResponseDto installmentsResponseDto = new InstallmentsResponseDto(paidInstallment, unpaidInstallment, missedInstallment);
-        return installmentsResponseDto;
+        return new InstallmentsResponseDto(paidInstallment, upcomingInstallment != null ? List.of(upcomingInstallment): Collections.emptyList(), missedInstallment);
     }
 
 
