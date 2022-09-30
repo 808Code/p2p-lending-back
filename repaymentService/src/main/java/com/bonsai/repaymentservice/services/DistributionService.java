@@ -1,10 +1,10 @@
 package com.bonsai.repaymentservice.services;
 
-import com.bonsai.repaymentservice.dto.EmailAmount;
+import com.bonsai.repaymentservice.dto.Lending;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface DistributionService {
-    void distribute(List<EmailAmount> lenders, BigDecimal amount);
+    BigDecimal distribute(List<Lending> lendings, BigDecimal amount, int duration);
 }
