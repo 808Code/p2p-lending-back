@@ -15,6 +15,7 @@ import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
 import com.bonsai.repaymentservice.constants.InstallmentStatus;
+import com.bonsai.repaymentservice.constants.InterestRate;
 import com.bonsai.repaymentservice.dto.InstallmentDto;
 import com.bonsai.repaymentservice.services.InstallmentService;
 import com.bonsai.loanservice.services.LoanService;
@@ -119,11 +120,11 @@ public class LendingServiceImpl implements LendingService {
 
         //credit to borrower wallet after loan is fulfilled
         Long newCollectedAmount = loanCollectionService.getLoanCollectionAmount(loanRequest.getId());
-        walletService.loadWallet(newCollectedAmount,
+        walletService.loadWallet(BigDecimal.valueOf(newCollectedAmount),
                 loanRequest.getBorrower().getEmail(),
                 "Loan amount credited into wallet");
 
-        BigDecimal emi = installmentService.calculateMonthlyEMI(loanRequest.getAmount(),loanRequest.getDuration(),12);
+        BigDecimal emi = installmentService.calculateMonthlyEMI(loanRequest.getAmount(),loanRequest.getDuration(), InterestRate.BORROWER_INTEREST);
         LocalDate localDateNow=LocalDate.now();
         for(int i = 1; i <= loanRequest.getDuration(); i++) {
             localDateNow = localDateNow.plusDays(30);

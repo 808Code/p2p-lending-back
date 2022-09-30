@@ -1,10 +1,10 @@
 package com.bonsai.walletservice.services;
 
-import com.bonsai.walletservice.constants.WalletTransactionTypes;
+import com.bonsai.walletservice.dtos.LoadWalletDto;
 import com.bonsai.walletservice.models.Wallet;
+import com.bonsai.walletservice.models.WalletTransaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public interface WalletService {
     Wallet findUserWallet(String email);
-    BigDecimal loadWallet(Long amount, String user, String remarks);
+    LoadWalletDto loadWallet(BigDecimal amount, String user, String remarks);
     Map<String, BigDecimal> fetchBalanceFromWallet(String email);
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
     UUID debitOrLockAmount(String transactionType, BigDecimal amount, String userEmail);

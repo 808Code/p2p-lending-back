@@ -3,6 +3,7 @@ package com.bonsai.walletservice.services.impl;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
+import com.bonsai.walletservice.dtos.LoadWalletDto;
 import com.bonsai.walletservice.models.Wallet;
 import com.bonsai.walletservice.models.WalletTransaction;
 import com.bonsai.walletservice.repositories.WalletRepo;
@@ -44,19 +45,19 @@ public class WalletServiceImpl implements WalletService {
 
     @Transactional
     @Override
-    public BigDecimal loadWallet(Long amount, String user, String remarks) {
+    public LoadWalletDto loadWallet(BigDecimal amount, String user, String remarks) {
 
         //get the wallet of the given user
         Wallet wallet = findUserWallet(user);
 
         //add amount to wallet
-        wallet.setAmount(wallet.getAmount().add(BigDecimal.valueOf(amount)));
+        wallet.setAmount(wallet.getAmount().add(amount));
 
         //build transaction for this operation
         WalletTransaction walletTransaction = new WalletTransaction();
         walletTransaction.setWallet(wallet);
         walletTransaction.setDate(LocalDateTime.now());
-        walletTransaction.setAmount(BigDecimal.valueOf(amount));
+        walletTransaction.setAmount(amount);
         walletTransaction.setType(WalletTransactionTypes.CREDIT);
         walletTransaction.setRemarks(remarks);
 
@@ -65,7 +66,7 @@ public class WalletServiceImpl implements WalletService {
         //create new transaction and save it into database
         walletTransactionRepo.save(walletTransaction);
 
-        return wallet.getAmount();
+        return new LoadWalletDto(amount,walletTransaction);
     }
 
     @Override

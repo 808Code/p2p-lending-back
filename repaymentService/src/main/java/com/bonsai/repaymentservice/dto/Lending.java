@@ -1,9 +1,11 @@
 package com.bonsai.repaymentservice.dto;
 
-public interface EmailAmount {
+public interface Lending {
     String getEmail();
 
     Long getAmount();
+
+    String getId();
 
 
 }
