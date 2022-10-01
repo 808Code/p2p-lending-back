@@ -2,8 +2,10 @@ package com.bonsai.repaymentservice.controllers;
 
 
 import com.bonsai.repaymentservice.dto.GetInstallmentsDto;
+import com.bonsai.repaymentservice.dto.GetLendingInterestsRequest;
 import com.bonsai.repaymentservice.dto.PayInstallmentRequest;
 import com.bonsai.repaymentservice.services.InstallmentService;
+import com.bonsai.repaymentservice.services.InterestService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import javax.validation.Valid;
 public class RepaymentController {
 
     private final InstallmentService installmentService;
+    private final InterestService interestService;
 
     @PostMapping("/getInstallments")
     public ResponseEntity<SuccessResponse> getInstallments(@Valid @RequestBody GetInstallmentsDto getInstallmentsDto) {
@@ -34,6 +37,13 @@ public class RepaymentController {
         installmentService.payInstallment(payInstallmentRequest);
         return ResponseEntity.ok(
                 new SuccessResponse("Installment Paid successfully.", true)
+        );
+    }
+
+    @PostMapping("/getLendingInterests")
+    public ResponseEntity<SuccessResponse> getLendingInterests(@Valid @RequestBody GetLendingInterestsRequest getLendingInterestsRequest) {
+        return ResponseEntity.ok(
+                new SuccessResponse("Interests Recieved", interestService.getInterests(getLendingInterestsRequest))
         );
     }
 
