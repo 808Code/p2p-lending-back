@@ -133,7 +133,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
         if (profilePhotoFile != null) {
-            storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
+            profilePhotoFileStorageName = storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
         }
         if (citizenShipPhotoBackFile != null) {
             citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
