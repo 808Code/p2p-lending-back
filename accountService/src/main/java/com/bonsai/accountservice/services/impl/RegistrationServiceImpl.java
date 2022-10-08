@@ -123,7 +123,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         String citizenShipPhotoFrontFileStorageName = "";
         String citizenShipPhotoBackFileStorageName = "";
 
-
+        if (persisted != null && profilePhotoFile == null) {
+            citizenShipPhotoFrontFileStorageName = persisted.getCitizenShipPhotoFront();
+        }
         if (persisted != null && citizenShipPhotoFrontFile == null) {
             citizenShipPhotoFrontFileStorageName = persisted.getCitizenShipPhotoFront();
         }
