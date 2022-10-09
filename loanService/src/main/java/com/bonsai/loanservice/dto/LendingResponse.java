@@ -6,6 +6,7 @@ import com.bonsai.loanservice.models.LoanCollection;
 import java.time.format.DateTimeFormatter;
 
 public record LendingResponse(
+        String lendingId,
         String transactionId,
         String loanRequestId,
         String lentDate,
@@ -15,6 +16,7 @@ public record LendingResponse(
 ) {
     public LendingResponse(Lending lending) {
         this(
+                lending.getId().toString(),
                 lending.getTransaction().getId().toString(),
                 lending.getLoanRequest().getId().toString(),
                 lending.getTransaction().getDate().format(DateTimeFormatter.ofPattern("YYYY-MM-dd")),
@@ -26,6 +28,7 @@ public record LendingResponse(
 
     public LendingResponse(LoanCollection collection) {
         this(
+                "",
                 collection.getWalletTransaction().getId().toString(),
                 collection.getLoanRequest().getId().toString(),
                 collection.getWalletTransaction().getDate().format(DateTimeFormatter.ofPattern("YYYY-MM-dd")),
