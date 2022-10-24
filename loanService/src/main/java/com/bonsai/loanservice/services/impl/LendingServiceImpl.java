@@ -6,6 +6,7 @@ import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.dto.LendRequest;
 import com.bonsai.loanservice.dto.LendingResponse;
+import com.bonsai.loanservice.dto.Notification;
 import com.bonsai.loanservice.models.Lending;
 import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
@@ -14,11 +15,12 @@ import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LendingService;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.loanservice.services.LoanService;
+import com.bonsai.loanservice.services.NotificationService;
 import com.bonsai.repaymentservice.constants.InstallmentStatus;
 import com.bonsai.repaymentservice.constants.InterestRate;
 import com.bonsai.repaymentservice.dto.InstallmentDto;
 import com.bonsai.repaymentservice.services.InstallmentService;
-import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.WalletTransaction;
@@ -27,6 +29,7 @@ import com.bonsai.walletservice.services.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -48,6 +51,8 @@ public class LendingServiceImpl implements LendingService {
     private final InstallmentService installmentService;
     private final LoanCollectionRepo loanCollectionRepo;
     private final LoanService loanService;
+
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -140,6 +145,9 @@ public class LendingServiceImpl implements LendingService {
         }
         //clear loan collection after loan is fulfilled
         loanCollectionService.deleteAllByLoanRequestId(loanRequest.getId());
+
+        notificationService.pushNotification(new Notification(loanRequest.getBorrower().getEmail(), "Your loan request of Rs."+loanRequest.getAmount()
+                +" has been fulfilled."));
 
         return lendRequest.amount();
     }
