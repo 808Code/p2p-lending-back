@@ -4,12 +4,15 @@ import com.bonsai.repaymentservice.dto.Interest;
 import com.bonsai.repaymentservice.dto.Lending;
 import com.bonsai.repaymentservice.models.Installment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
+@Transactional
 @Repository
 public interface InstallmentRepo extends JpaRepository<Installment, UUID> {
     List<Installment> findAllByLoanRequest(UUID loanRequestId);
@@ -35,5 +38,11 @@ public interface InstallmentRepo extends JpaRepository<Installment, UUID> {
                      
             """)
     List<Interest> fetchAllByInterestsByLendingId(UUID lendingId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            UPDATE loan_request SET loan_status= ?2 WHERE id = ?1                     
+              """)
+    void makeLoanCompletedByLoanID(UUID loanId, String loanStatus);
 
 }
