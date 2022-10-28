@@ -58,9 +58,9 @@ public class RegistrationController {
         );
     }
 
-    @PostMapping("/verifyKYC")
-    public ResponseEntity<SuccessResponse> verifyKYC(@RequestBody VerifyKYCRequest request){
-        kycService.verifyKYC(request);
+    @GetMapping("/verifyKYC/{email}")
+    public ResponseEntity<SuccessResponse> verifyKYC(@PathVariable String email){
+        kycService.verifyKYC(email);
         return ResponseEntity.ok(
                 new SuccessResponse("KYC verified.",true)
         );
