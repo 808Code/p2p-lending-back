@@ -1,10 +1,8 @@
 package com.bonsai.accountservice.services.impl;
 
 import com.bonsai.accountservice.dto.request.GetKYCRequest;
-import com.bonsai.accountservice.dto.request.VerifyKYCRequest;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.models.UserCredential;
-import com.bonsai.accountservice.repositories.KYCRepo;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.sharedservice.exceptions.AppException;
@@ -33,8 +31,8 @@ public class KYCServiceImpl implements KYCService {
     }
 
     @Override
-    public void verifyKYC(VerifyKYCRequest request) {
-        UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
+    public void verifyKYC(String email) {
+        UserCredential userCredential = userCredentialRepo.findByEmail(email)
                 .orElseThrow(() ->new AppException("Email not found in database.",HttpStatus.NOT_FOUND));
         userCredential.setKycVerified(true);
         userCredentialRepo.save(userCredential);
