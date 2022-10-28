@@ -7,7 +7,6 @@ import com.bonsai.repaymentservice.dto.*;
 import com.bonsai.repaymentservice.models.Installment;
 import com.bonsai.repaymentservice.models.PlatformEarning;
 import com.bonsai.repaymentservice.repositories.InstallmentRepo;
-import com.bonsai.repaymentservice.repositories.InterestDistributionRepo;
 import com.bonsai.repaymentservice.repositories.PlatformEarningRepo;
 import com.bonsai.repaymentservice.services.DistributionService;
 import com.bonsai.repaymentservice.services.InstallmentService;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -51,7 +51,7 @@ public class InstallmentServiceImpl implements InstallmentService {
 
     @Override
     public BigDecimal calculateMonthlyEMI(long principal, int durationInMonths, float rateYearly) {
-        double monthlyInterest =  principal * 1.0 * rateYearly / 1200;
+        double monthlyInterest = principal * 1.0 * rateYearly / 1200;
         double monthlyPrincipal = principal * 1.0 / durationInMonths;
 
         return BigDecimal.valueOf(monthlyInterest + monthlyPrincipal);
@@ -59,10 +59,11 @@ public class InstallmentServiceImpl implements InstallmentService {
 
     }
 
+    @Transactional
     @Override
     public void payInstallment(PayInstallmentRequest payInstallmentRequest) {
-        List<Installment> installments = installmentRepo.findAllByLoanRequest(UUID.fromString(payInstallmentRequest.loanId()));
-
+        UUID loanId = UUID.fromString(payInstallmentRequest.loanId());
+        List<Installment> installments = installmentRepo.findAllByLoanRequest(loanId);
         Iterator<Installment> installmentIterator = installments.iterator();
         Installment installment = null;
         int paidCounter = 0;
@@ -103,7 +104,7 @@ public class InstallmentServiceImpl implements InstallmentService {
                     .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
             userCredential.setOngoingLoan(false);
             userCredentialRepo.save(userCredential);
-
+            installmentRepo.makeLoanCompletedByLoanID(loanId, "COMPLETED");
         }
 
 

@@ -43,7 +43,7 @@ public class RepaymentController {
     @PostMapping("/getLendingInterests")
     public ResponseEntity<SuccessResponse> getLendingInterests(@Valid @RequestBody GetLendingInterestsRequest getLendingInterestsRequest) {
         return ResponseEntity.ok(
-                new SuccessResponse("Interests Recieved", interestService.getInterests(getLendingInterestsRequest))
+                new SuccessResponse("Interests Received", interestService.getInterests(getLendingInterestsRequest))
         );
     }
 
