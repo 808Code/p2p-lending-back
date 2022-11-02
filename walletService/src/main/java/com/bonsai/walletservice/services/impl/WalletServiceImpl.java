@@ -129,7 +129,7 @@ public class WalletServiceImpl implements WalletService {
     @Override
     public Boolean isBalanceSufficient(String userEmail, BigDecimal amount) {
         BigDecimal availableBalance = fetchBalanceFromWallet(userEmail).get("availableBalance");
-        return (availableBalance.compareTo(amount) > 0) || (availableBalance.equals(amount));
+        return ((availableBalance.compareTo(amount) > 0) || (availableBalance.compareTo(amount)==0));
     }
 
 }
