@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -20,11 +23,14 @@ public class KYCServiceImpl implements KYCService {
     private final UserCredentialRepo userCredentialRepo;
 
     @Override
-    public KYC getKYC(GetKYCRequest request) {
-        UserCredential userCredential = userCredentialRepo.findByEmail(request.email())
-                .orElseThrow(() ->new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
+    public KYC getKYC(String request) {
+        UserCredential userCredential = userCredentialRepo.findByEmail(request)
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
 
+        if (userCredential.getKyc() == null)
+            throw new AppException("KYC not found in database.", HttpStatus.NOT_FOUND);
         KYC kyc = userCredential.getKyc();
+
         kyc.setVerified(userCredential.isKycVerified());
 
         return kyc;
@@ -33,9 +39,22 @@ public class KYCServiceImpl implements KYCService {
     @Override
     public void verifyKYC(String email) {
         UserCredential userCredential = userCredentialRepo.findByEmail(email)
-                .orElseThrow(() ->new AppException("Email not found in database.",HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND));
         userCredential.setKycVerified(true);
         userCredentialRepo.save(userCredential);
 
+    }
+
+    @Override
+    public List<KYC> getAllUnverifiedKYC() {
+        List<UserCredential> kycUnverifiedUsers = userCredentialRepo.findAllKycUnverifiedUsers();
+        List<KYC> unverifiedKycs = new ArrayList<>();
+        for (UserCredential userCredential : kycUnverifiedUsers) {
+            KYC kyc = userCredential.getKyc();
+            if (kyc != null) {
+                unverifiedKycs.add(kyc);
+            }
+        }
+        return unverifiedKycs;
     }
 }

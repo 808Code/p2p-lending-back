@@ -1,5 +1,6 @@
 package com.bonsai.accountservice.repositories;
 
+import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.models.UserCredential;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,4 +27,11 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
     @Query(nativeQuery = true, value = "insert into wallet (id, user_id, amount)\n" +
             "values (?1, ?2, 0)")
     void createWallet(UUID id, UUID userId);
+
+    List<KYC> findAllByKycVerified(boolean b);
+@Query(nativeQuery = true, value = """
+            select *
+            from user_credential u
+            where u.kyc_verified = false""")
+    List<UserCredential> findAllKycUnverifiedUsers();
 }

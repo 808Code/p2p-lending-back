@@ -136,10 +136,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
         }
         if (citizenShipPhotoBackFile != null) {
-            citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
+            citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(),
+                    FileCategory.CITIZENSHIP_BACK);
         }
         if (citizenShipPhotoFrontFile != null) {
-            citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
+            citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(),
+                    FileCategory.CITIZENSHIP_FRONT);
         }
         try {
             contact = objectMapper.readValue(request.contact(), Contact.class);

@@ -58,8 +58,8 @@ public class RegistrationController {
         );
     }
 
-    @GetMapping("/verifyKYC/{email}")
-    public ResponseEntity<SuccessResponse> verifyKYC(@PathVariable String email){
+    @GetMapping("/verifyKYC")
+    public ResponseEntity<SuccessResponse> verifyKYC(@RequestParam String email){
         kycService.verifyKYC(email);
         return ResponseEntity.ok(
                 new SuccessResponse("KYC verified.",true)
@@ -67,10 +67,16 @@ public class RegistrationController {
     }
 
     @PostMapping("/getKYC")
-    public ResponseEntity<SuccessResponse> getKYC(@RequestBody GetKYCRequest request){
+    public ResponseEntity<SuccessResponse> getKYC(@RequestParam String request){
         KYC kyc = kycService.getKYC(request);
         return ResponseEntity.ok(
-                new SuccessResponse("KYC for "+request.email(),kyc)
+                new SuccessResponse("KYC for "+request,kyc)
+        );
+    }
+    @GetMapping("/getAllUnverifiedKYC")
+    public ResponseEntity<SuccessResponse> getAllUnverifiedKYC(){
+        return ResponseEntity.ok(
+                new SuccessResponse("All Unverified KYC",kycService.getAllUnverifiedKYC())
         );
     }
 
