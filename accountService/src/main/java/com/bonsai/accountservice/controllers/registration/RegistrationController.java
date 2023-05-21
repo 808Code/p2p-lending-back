@@ -7,6 +7,7 @@ import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
+import com.bonsai.accountservice.services.PasswordResetService;
 import com.bonsai.accountservice.services.RegistrationService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class RegistrationController {
 
     private final RegistrationService registrationService;
     private final KYCService kycService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/sendEmailOTP")
     public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request) {
@@ -84,13 +86,16 @@ public class RegistrationController {
                 new SuccessResponse("All Unverified KYC", kycService.getAllUnverifiedKYC())
         );
     }
-
     @PostMapping("/admin-kyc-message")
     public ResponseEntity<SuccessResponse> postAdminKycMessage(@RequestBody AdminKycMessageRequest adminKycMessageRequest) {
         kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.kycId());
         return ResponseEntity.ok(
                 new SuccessResponse("Admin message Posted successfully", null));
     }
+
+
+
+
 
 }
 
