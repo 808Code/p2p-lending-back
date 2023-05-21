@@ -24,7 +24,7 @@ public class RegistrationController {
     private final KYCService kycService;
 
     @PostMapping("/sendEmailOTP")
-    public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request){
+    public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request) {
         registrationService.sendEmailOTP(request.email());
 
         return ResponseEntity.ok(
@@ -33,17 +33,16 @@ public class RegistrationController {
     }
 
     @PostMapping("/verifyEmailOTP")
-    public ResponseEntity<SuccessResponse> verifyEmailOTP(@RequestBody VerifyOTPRequest request){
-       registrationService.verifyEmailOTP(request);
+    public ResponseEntity<SuccessResponse> verifyEmailOTP(@RequestBody VerifyOTPRequest request) {
+        registrationService.verifyEmailOTP(request);
 
-       return ResponseEntity.ok(
-               new SuccessResponse("otpCode verified", true)
-       );
-
+        return ResponseEntity.ok(
+                new SuccessResponse("otpCode verified", true)
+        );
     }
 
     @PostMapping("/createBorrower")
-    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody UserAuth request){
+    public ResponseEntity<SuccessResponse> createBorrower(@RequestBody UserAuth request) {
         registrationService.saveEmailPassword(request, Roles.BORROWER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Borrower.", true)
@@ -51,33 +50,49 @@ public class RegistrationController {
     }
 
     @PostMapping("/createLender")
-    public ResponseEntity<SuccessResponse> createLENDER(@RequestBody UserAuth request){
-        registrationService.saveEmailPassword(request,Roles.LENDER);
+    public ResponseEntity<SuccessResponse> createLENDER(@RequestBody UserAuth request) {
+        registrationService.saveEmailPassword(request, Roles.LENDER);
         return ResponseEntity.ok(
                 new SuccessResponse("Account Created as Lender.", true)
         );
     }
+    @PostMapping("/createAdmin")
+    public ResponseEntity<SuccessResponse> createAdmin(@RequestBody UserAuth request){
+        registrationService.saveEmailPassword(request,Roles.ADMIN);
+        return ResponseEntity.ok(new SuccessResponse("Account Created as a Admin",true));
+    }
 
     @GetMapping("/verifyKYC")
-    public ResponseEntity<SuccessResponse> verifyKYC(@RequestParam String email){
+    public ResponseEntity<SuccessResponse> verifyKYC(@RequestParam String email) {
         kycService.verifyKYC(email);
         return ResponseEntity.ok(
-                new SuccessResponse("KYC verified.",true)
+                new SuccessResponse("KYC verified.", true)
         );
     }
 
     @PostMapping("/getKYC")
-    public ResponseEntity<SuccessResponse> getKYC(@RequestParam String request){
+    public ResponseEntity<SuccessResponse> getKYC(@RequestParam String request) {
         KYC kyc = kycService.getKYC(request);
         return ResponseEntity.ok(
-                new SuccessResponse("KYC for "+request,kyc)
-        );
-    }
-    @GetMapping("/getAllUnverifiedKYC")
-    public ResponseEntity<SuccessResponse> getAllUnverifiedKYC(){
-        return ResponseEntity.ok(
-                new SuccessResponse("All Unverified KYC",kycService.getAllUnverifiedKYC())
+                new SuccessResponse("KYC for " + request, kyc)
         );
     }
 
+    @GetMapping("/getAllUnverifiedKYC")
+    public ResponseEntity<SuccessResponse> getAllUnverifiedKYC() {
+        return ResponseEntity.ok(
+                new SuccessResponse("All Unverified KYC", kycService.getAllUnverifiedKYC())
+        );
+    }
+
+    @PostMapping("/admin-kyc-message")
+    public ResponseEntity<SuccessResponse> postAdminKycMessage(@RequestBody AdminKycMessageRequest adminKycMessageRequest) {
+        kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.kycId());
+        return ResponseEntity.ok(
+                new SuccessResponse("Admin message Posted successfully", null));
+    }
+
 }
+
+
+

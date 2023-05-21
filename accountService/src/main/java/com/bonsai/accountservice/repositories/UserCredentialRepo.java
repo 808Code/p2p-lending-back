@@ -13,7 +13,9 @@ import java.util.UUID;
 public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> {
 
     Optional<UserCredential> findByIdAndRole(UUID id, String role);
+
     Optional<UserCredential> findByEmail(String email);
+
     Optional<UserCredential> findByEmailAndRole(String email, String role);
 
     @Query(nativeQuery = true, value = """
@@ -28,10 +30,18 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
             "values (?1, ?2, 0)")
     void createWallet(UUID id, UUID userId);
 
-    List<KYC> findAllByKycVerified(boolean b);
-@Query(nativeQuery = true, value = """
+
+    @Query(nativeQuery = true, value = """
             select *
             from user_credential u
-            where u.kyc_verified = false""")
+            where u.kyc_verified = false"""
+    )
     List<UserCredential> findAllKycUnverifiedUsers();
+    @Modifying
+    @Query(nativeQuery = true,value = """
+                update user_credential
+                set kyc_message = ?1
+                where kyc_id = ?2
+            """)
+    void saveAdminKycMessage(String message, UUID kycId);
 }

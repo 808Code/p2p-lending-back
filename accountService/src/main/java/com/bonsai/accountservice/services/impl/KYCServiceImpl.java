@@ -1,6 +1,6 @@
 package com.bonsai.accountservice.services.impl;
 
-import com.bonsai.accountservice.dto.request.GetKYCRequest;
+import com.bonsai.accountservice.dto.response.UnverifiedKycResponse;
 import com.bonsai.accountservice.models.KYC;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
@@ -11,9 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 
 @Service
@@ -46,15 +47,29 @@ public class KYCServiceImpl implements KYCService {
     }
 
     @Override
-    public List<KYC> getAllUnverifiedKYC() {
+    public List<UnverifiedKycResponse> getAllUnverifiedKYC() {
         List<UserCredential> kycUnverifiedUsers = userCredentialRepo.findAllKycUnverifiedUsers();
-        List<KYC> unverifiedKycs = new ArrayList<>();
+        List<UnverifiedKycResponse> unverifiedKycResponseList = new ArrayList<>();
         for (UserCredential userCredential : kycUnverifiedUsers) {
             KYC kyc = userCredential.getKyc();
             if (kyc != null) {
-                unverifiedKycs.add(kyc);
+                String fullName = kyc.getFirstName() + " " + (kyc.getMiddleName() != null ? kyc.getMiddleName() : "") + " " + kyc.getLastName();
+                UnverifiedKycResponse unverifiedKycResponse = new UnverifiedKycResponse(
+                        kyc.getId().toString(),
+                        fullName,
+                        kyc.getLastModifiedDate().toString(),
+                        userCredential.getRole(),
+                        userCredential.getEmail()
+                );
+                unverifiedKycResponseList.add(unverifiedKycResponse);
             }
         }
-        return unverifiedKycs;
+        return unverifiedKycResponseList;
+    }
+
+    @Transactional
+    @Override
+    public void saveAdminKycMessage(String message, UUID kycId) {
+        userCredentialRepo.saveAdminKycMessage(message, kycId);
     }
 }
