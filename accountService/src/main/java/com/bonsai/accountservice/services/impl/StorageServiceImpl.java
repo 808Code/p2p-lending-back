@@ -27,11 +27,9 @@ public class StorageServiceImpl implements StorageService {
     public void store(MultipartFile file,String storageName){
         try {
             file.transferTo(Path.of(fileUploadLocation+"/"+storageName));
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     @Override

@@ -38,4 +38,7 @@ public class UserCredential {
 
     @Column(name = "last_active_date")
     private LocalDate lastActiveDate;
+
+    @Column(name = "kyc_message",columnDefinition = "TEXT DEFAULT 'Application Under Review'")
+    private String kycMessage;
 }

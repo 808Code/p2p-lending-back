@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.bonsai.accountservice.services.*;
@@ -90,9 +91,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (userCredentialRepo.findByEmail(email).isPresent()) {
             throw new InvalidOTPException("Email Already Registered.");
         }
-        OTP otpCodeWithVerification = otpStorage.getOtp(email);
-        if (otpCodeWithVerification == null || !otpCodeWithVerification.getVerification()) {
-            throw new InvalidOTPException("otpCode not verified");
+        if(!role.equals("ADMIN")) {
+            OTP otpCodeWithVerification = otpStorage.getOtp(email);
+            if (otpCodeWithVerification == null || !otpCodeWithVerification.getVerification()) {
+                throw new InvalidOTPException("otpCode not verified");
+            }
         }
 
         UserCredential userCredential = UserCredential.builder()
@@ -136,10 +139,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             storageName.storageNameGenerator(profilePhotoFile.getOriginalFilename(), FileCategory.PROFILE_PHOTO);
         }
         if (citizenShipPhotoBackFile != null) {
-            citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(), FileCategory.CITIZENSHIP_BACK);
+            citizenShipPhotoBackFileStorageName = storageName.storageNameGenerator(citizenShipPhotoBackFile.getOriginalFilename(),
+                    FileCategory.CITIZENSHIP_BACK);
         }
         if (citizenShipPhotoFrontFile != null) {
-            citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(), FileCategory.CITIZENSHIP_FRONT);
+            citizenShipPhotoFrontFileStorageName = storageName.storageNameGenerator(citizenShipPhotoFrontFile.getOriginalFilename(),
+                    FileCategory.CITIZENSHIP_FRONT);
         }
         try {
             contact = objectMapper.readValue(request.contact(), Contact.class);
@@ -149,6 +154,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new AppException("Unable to process Json Data", HttpStatus.BAD_REQUEST);
         }
         KYC kyc = KYC.builder()
+                .id(request.id())
                 .firstName(request.firstName())
                 .lastName(request.lastName())
                 .middleName(request.middleName())
@@ -165,8 +171,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 .profilePhoto(profilePhotoFileStorageName)
                 .citizenShipPhotoFront(citizenShipPhotoFrontFileStorageName)
                 .citizenShipPhotoBack(citizenShipPhotoBackFileStorageName)
+                .lastModifiedDate(LocalDateTime.now())
                 .build();
-
 
         kycRepo.save(kyc);
 

@@ -1,9 +1,11 @@
 package com.bonsai.accountservice.models;
 
 import lombok.*;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Builder
@@ -39,7 +41,6 @@ public class KYC {
     private String gender;
 
 
-
     @Column(nullable = false)
     private String maritalStatus;
 
@@ -72,10 +73,13 @@ public class KYC {
     private String profilePhoto;
 
     @Column
-    private String  citizenShipPhotoFront;
+    private String citizenShipPhotoFront;
 
     @Column
-    private String  citizenShipPhotoBack;
+    private String citizenShipPhotoBack;
+
+    @Column
+    private LocalDateTime lastModifiedDate;
 
     @Transient
     private boolean verified;
