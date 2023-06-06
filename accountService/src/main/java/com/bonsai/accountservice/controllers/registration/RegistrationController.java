@@ -65,18 +65,18 @@ public class RegistrationController {
     }
 
     @GetMapping("/verifyKYC")
-    public ResponseEntity<SuccessResponse> verifyKYC(@RequestParam String email) {
-        kycService.verifyKYC(email);
+    public ResponseEntity<SuccessResponse> verifyKYC( @RequestBody KYCRequestPojo kycRequestPojo) {
+        kycService.verifyKYC(kycRequestPojo.email());
         return ResponseEntity.ok(
                 new SuccessResponse("KYC verified.", true)
         );
     }
 
     @PostMapping("/getKYC")
-    public ResponseEntity<SuccessResponse> getKYC(@RequestParam String request) {
-        KYC kyc = kycService.getKYC(request);
+    public ResponseEntity<SuccessResponse> getKYC(@RequestBody KYCRequestPojo kycRequestPojo) {
+        KYC kyc = kycService.getKYC(kycRequestPojo.email());
         return ResponseEntity.ok(
-                new SuccessResponse("KYC for " + request, kyc)
+                new SuccessResponse("KYC for " + kycRequestPojo.email(), kyc)
         );
     }
 

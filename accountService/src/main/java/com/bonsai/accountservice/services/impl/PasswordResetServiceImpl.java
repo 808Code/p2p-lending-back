@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PasswordResetServiceImpl implements PasswordResetService {
 
     //@Value("${account.app.url}")
-    private String appUrl = "http://localhost:8081";
+    private String appUrl = "http://localhost:3000";
 
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -44,7 +44,7 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         passwordResetTokenRepository.save(passwordResetToken);
 
         // Send password reset email with token value
-        String resetUrl = appUrl + "/reset-password?token=" + passwordResetToken.getToken();
+        String resetUrl = appUrl + "/#/reset-password?token=" + passwordResetToken.getToken();
         String subject = "Reset your password";
         String text = "To reset your password, click the link below:\n\n" + resetUrl;
         emailService.sendEmail(email, subject, text);

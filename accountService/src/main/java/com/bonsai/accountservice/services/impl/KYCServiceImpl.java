@@ -54,13 +54,7 @@ public class KYCServiceImpl implements KYCService {
             KYC kyc = userCredential.getKyc();
             if (kyc != null) {
                 String fullName = kyc.getFirstName() + " " + (kyc.getMiddleName() != null ? kyc.getMiddleName() : "") + " " + kyc.getLastName();
-                UnverifiedKycResponse unverifiedKycResponse = new UnverifiedKycResponse(
-                        kyc.getId().toString(),
-                        fullName,
-                        kyc.getLastModifiedDate().toString(),
-                        userCredential.getRole(),
-                        userCredential.getEmail()
-                );
+                UnverifiedKycResponse unverifiedKycResponse = new UnverifiedKycResponse(kyc, userCredential);
                 unverifiedKycResponseList.add(unverifiedKycResponse);
             }
         }

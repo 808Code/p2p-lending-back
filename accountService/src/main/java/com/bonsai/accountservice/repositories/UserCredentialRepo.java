@@ -34,7 +34,8 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
     @Query(nativeQuery = true, value = """
             select *
             from user_credential u
-            where u.kyc_verified = false"""
+            where u.kyc_verified = false
+            """
     )
     List<UserCredential> findAllKycUnverifiedUsers();
     @Modifying

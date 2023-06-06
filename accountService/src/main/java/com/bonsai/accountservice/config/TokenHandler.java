@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.bonsai.sharedservice.exceptions.AppException;
+import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
@@ -37,8 +39,14 @@ public class TokenHandler {
     }
 
     public static boolean hasTokenExpired(String token) {
-        DecodedJWT decoder = JWT.decode(token);
-        Date expiryDate = decoder.getExpiresAt();
-        return expiryDate.before(new Date());
+        try {
+            DecodedJWT decoder = JWT.decode(token);
+            Date expiryDate = decoder.getExpiresAt();
+            return expiryDate.before(new Date());
+        } catch (Exception e) {
+            throw new AppException("Invalid token", HttpStatus.BAD_REQUEST);
+        }
     }
+
+
 }

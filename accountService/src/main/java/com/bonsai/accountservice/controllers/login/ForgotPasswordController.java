@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 public class ForgotPasswordController {
-    private final KYCService kycService;
     private final PasswordResetService passwordResetService;
-
-
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         passwordResetService.createPasswordResetToken(request.email());
