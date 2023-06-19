@@ -64,7 +64,7 @@ public class RegistrationController {
         return ResponseEntity.ok(new SuccessResponse("Account Created as a Admin",true));
     }
 
-    @GetMapping("/verifyKYC")
+    @PostMapping("/verifyKYC")
     public ResponseEntity<SuccessResponse> verifyKYC( @RequestBody KYCRequestPojo kycRequestPojo) {
         kycService.verifyKYC(kycRequestPojo.email());
         return ResponseEntity.ok(
@@ -88,9 +88,15 @@ public class RegistrationController {
     }
     @PostMapping("/admin-kyc-message")
     public ResponseEntity<SuccessResponse> postAdminKycMessage(@RequestBody AdminKycMessageRequest adminKycMessageRequest) {
-        kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.kycId());
+        kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.email());
         return ResponseEntity.ok(
                 new SuccessResponse("Admin message Posted successfully", null));
+    }
+    @GetMapping("/getAdminKycMessage/{email}")
+    public ResponseEntity<SuccessResponse> getAdminKycMessage(@PathVariable("email") String email) {
+        return ResponseEntity.ok(
+                new SuccessResponse("Admin message for " + email, kycService.getAdminKycMessage(email))
+        );
     }
 
 

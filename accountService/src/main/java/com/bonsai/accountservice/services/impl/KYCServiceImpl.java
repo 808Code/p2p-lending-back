@@ -63,7 +63,18 @@ public class KYCServiceImpl implements KYCService {
 
     @Transactional
     @Override
-    public void saveAdminKycMessage(String message, UUID kycId) {
+    public void saveAdminKycMessage(String message, String email) {
+        UUID kycId = userCredentialRepo.findByEmail(email)
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND))
+                .getKyc().getId();
         userCredentialRepo.saveAdminKycMessage(message, kycId);
+    }
+
+    @Override
+    public String getAdminKycMessage(String email) {
+        UUID kycId = userCredentialRepo.findByEmail(email)
+                .orElseThrow(() -> new AppException("Email not found in database.", HttpStatus.NOT_FOUND))
+                .getKyc().getId();
+        return userCredentialRepo.getAdminKycMessage(kycId);
     }
 }
