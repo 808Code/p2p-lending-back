@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
-@RequestMapping("sse")
+@RequestMapping("/notification")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class NotificationController {
