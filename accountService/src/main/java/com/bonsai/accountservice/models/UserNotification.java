@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class    UserNotification {
+public class UserNotification {
     @Id
     @GeneratedValue
     private UUID id;
