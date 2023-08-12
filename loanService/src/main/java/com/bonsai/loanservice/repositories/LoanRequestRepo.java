@@ -39,30 +39,35 @@ public interface LoanRequestRepo extends JpaRepository<LoanRequest, UUID> {
     void clearLoanSuggestion(UUID loanId, String lenderEmail);
 
     @Query(nativeQuery = true, value = """
-            select *
+            select lr.*
             from loan_request lr
-            where lr.duration = ?1
-            and lr.loan_status = 'SUGGESTED'
-            and lr.remaining_amount >= ?2
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where (lc.lender_id <> ?1 or lc.lender_id is null)
+              and lr.duration = ?2
+              and lr.remaining_amount >= ?3
+              and lr.loan_status = 'NEW'
             order by lr.requested_date asc
             limit 1
-                  """)
-    Optional<LoanRequest> findLendableLoanRequest(Integer duration, Long remainingAmount);
+                   """)
+    Optional<LoanRequest> findLendableLoanRequest(String lenderId, Integer duration, Long remainingAmount);
 
     @Query(nativeQuery = true, value = """
-            select lr.duration
+            select distinct lr.duration
             from loan_request lr
-            where lr.loan_status = 'SUGGESTED'
-            group by lr.duration
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where lr.loan_status = 'NEW'
+              and (lc.lender_id <> ?1 or lc.lender_id is null)
             order by lr.duration asc
-            """)
-    List<Integer> getAvailableLendingDurationList();
+                                    """)
+    List<Integer> getAvailableLendingDurationList(String lenderId);
 
     @Query(nativeQuery = true, value = """
             select max(lr.remaining_amount)
             from loan_request lr
-            where lr.duration = ?1
-            and lr.loan_status = 'SUGGESTED'
-            """)
-    Long getMaximumRemainingLoanRequestAmountByDuration(Integer duration);
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where (lc.lender_id <> ?1 or lc.lender_id is null)
+              and lr.duration = ?2
+              and lr.loan_status = 'NEW'
+                        """)
+    Long getMaximumRemainingLoanRequestAmountByDuration(String lenderId, Integer duration);
 }
