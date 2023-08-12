@@ -69,16 +69,18 @@ public class LoanController {
     }
 
     @GetMapping("/getAvailableLendingDurationList")
-    public ResponseEntity<SuccessResponse> getAvailableLendingDuration() {
+    public ResponseEntity<SuccessResponse> getAvailableLendingDuration(Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
         return ResponseEntity.ok(
-                new SuccessResponse("Available lending duration list fetched successfully", lendingService.getAvailableLendingDurationList())
+                new SuccessResponse("Available lending duration list fetched successfully", lendingService.getAvailableLendingDurationList(user))
         );
     }
 
     @GetMapping("/getMaximumLendingAmount")
-    public ResponseEntity<SuccessResponse> getMaximumLendingAmount(@RequestParam(value = "duration") Integer duration) {
+    public ResponseEntity<SuccessResponse> getMaximumLendingAmount(@RequestParam(value = "duration") Integer duration, Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
         return ResponseEntity.ok(
-                new SuccessResponse("Maximum Lending Amount fetched successfully", lendingService.getMaximumLendingAmount(duration))
+                new SuccessResponse("Maximum Lending Amount fetched successfully", lendingService.getMaximumLendingAmount(user, duration))
         );
     }
 }

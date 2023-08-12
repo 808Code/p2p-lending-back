@@ -17,6 +17,6 @@ public interface LendingService {
 
     List<LendingResponse> fetchLendings(String lenderEmail);
 
-    List<String> getAvailableLendingDurationList();
-    Long getMaximumLendingAmount(Integer duration);
+    List<String> getAvailableLendingDurationList(String lenderEmail);
+    Long getMaximumLendingAmount(String lenderEmail, Integer duration);
 }

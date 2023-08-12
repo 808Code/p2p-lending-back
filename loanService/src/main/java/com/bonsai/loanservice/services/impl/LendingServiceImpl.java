@@ -61,11 +61,14 @@ public class LendingServiceImpl implements LendingService {
 
     @Override
     public Long createLending(LendingRequest lendingRequest, String lenderEmail) {
+        UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
+                .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
+
         if (lendingRequest.amount() % 5000 != 0) {
             throw new AppException("Lending amount must be in the multiple of 5000", HttpStatus.BAD_REQUEST);
         }
 
-        LoanRequest loanRequest = loanRepo.findLendableLoanRequest(lendingRequest.lendingDuration(), lendingRequest.amount())
+        LoanRequest loanRequest = loanRepo.findLendableLoanRequest(lender.getId().toString(), lendingRequest.lendingDuration(), lendingRequest.amount())
                 .orElseThrow(() ->
                         new AppException("Loan request not found", HttpStatus.NOT_FOUND)
                 );
@@ -220,14 +223,19 @@ public class LendingServiceImpl implements LendingService {
     }
 
     @Override
-    public List<String> getAvailableLendingDurationList() {
-        return loanRepo.getAvailableLendingDurationList().stream().map(integer -> integer.toString())
+    public List<String> getAvailableLendingDurationList(String lenderEmail) {
+        UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
+                .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
+        return loanRepo.getAvailableLendingDurationList(lender.getId().toString()).stream().map(integer -> integer.toString())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Long getMaximumLendingAmount(Integer duration) {
-        Long amount = loanRepo.getMaximumRemainingLoanRequestAmountByDuration(duration);
+    public Long getMaximumLendingAmount(String lenderEmail, Integer duration) {
+        UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
+                .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
+
+        Long amount = loanRepo.getMaximumRemainingLoanRequestAmountByDuration(lender.getId().toString(), duration);
         return amount == null ? 0L : amount;
     }
 
