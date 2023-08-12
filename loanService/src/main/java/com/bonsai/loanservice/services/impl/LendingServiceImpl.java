@@ -70,7 +70,7 @@ public class LendingServiceImpl implements LendingService {
             throw new AppException("Lending amount must be in the multiple of 5000", HttpStatus.BAD_REQUEST);
         }
 
-        LoanRequest loanRequest = loanRepo.findLendableLoanRequest(lender.getId().toString(), lendingRequest.lendingDuration(), lendingRequest.amount())
+        LoanRequest loanRequest = loanRepo.findLendableLoanRequest(lender.getId(), lendingRequest.lendingDuration(), lendingRequest.amount())
                 .orElseThrow(() ->
                         new AppException("Loan request not found", HttpStatus.NOT_FOUND)
                 );
@@ -235,7 +235,7 @@ public class LendingServiceImpl implements LendingService {
     public List<String> getAvailableLendingDurationList(String lenderEmail) {
         UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
                 .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
-        return loanRepo.getAvailableLendingDurationList(lender.getId().toString()).stream().map(integer -> integer.toString())
+        return loanRepo.getAvailableLendingDurationList(lender.getId()).stream().map(integer -> integer.toString())
                 .collect(Collectors.toList());
     }
 
@@ -244,7 +244,7 @@ public class LendingServiceImpl implements LendingService {
         UserCredential lender = userRepo.findByEmailAndRole(lenderEmail, Roles.LENDER)
                 .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
 
-        Long amount = loanRepo.getMaximumRemainingLoanRequestAmountByDuration(lender.getId().toString(), duration);
+        Long amount = loanRepo.getMaximumRemainingLoanRequestAmountByDuration(lender.getId(), duration);
 
         if (amount == null) {
             return 0L;

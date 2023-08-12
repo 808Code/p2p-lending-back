@@ -49,7 +49,7 @@ public interface LoanRequestRepo extends JpaRepository<LoanRequest, UUID> {
             order by lr.requested_date asc
             limit 1
                    """)
-    Optional<LoanRequest> findLendableLoanRequest(String lenderId, Integer duration, Long remainingAmount);
+    Optional<LoanRequest> findLendableLoanRequest(UUID lenderId, Integer duration, Long remainingAmount);
 
     @Query(nativeQuery = true, value = """
             select distinct lr.duration
@@ -59,7 +59,7 @@ public interface LoanRequestRepo extends JpaRepository<LoanRequest, UUID> {
               and (lc.lender_id <> ?1 or lc.lender_id is null)
             order by lr.duration asc
                                     """)
-    List<Integer> getAvailableLendingDurationList(String lenderId);
+    List<Integer> getAvailableLendingDurationList(UUID lenderId);
 
     @Query(nativeQuery = true, value = """
             select max(lr.remaining_amount)
@@ -69,5 +69,5 @@ public interface LoanRequestRepo extends JpaRepository<LoanRequest, UUID> {
               and lr.duration = ?2
               and lr.loan_status = 'NEW'
                         """)
-    Long getMaximumRemainingLoanRequestAmountByDuration(String lenderId, Integer duration);
+    Long getMaximumRemainingLoanRequestAmountByDuration(UUID lenderId, Integer duration);
 }
