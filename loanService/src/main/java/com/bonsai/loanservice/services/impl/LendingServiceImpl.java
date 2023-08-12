@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -217,8 +218,15 @@ public class LendingServiceImpl implements LendingService {
         List<Lending> lendings = lendingRepo.findAllByLender_Email(lenderEmail);
         List<LoanCollection> loanCollectionList = loanCollectionRepo.findAllByLender_Email(lenderEmail);
 
-        lendings.stream().forEach(lending -> response.add(new LendingResponse(lending)));
-        loanCollectionList.stream().forEach(collection -> response.add(new LendingResponse(collection)));
+        lendings.forEach(lending -> response.add(new LendingResponse(lending)));
+        loanCollectionList.forEach(collection -> response.add(new LendingResponse(collection)));
+
+        // Sort the response by lentDate and lentTime in descending order
+        response.sort(
+                Comparator.comparing(LendingResponse::lentDate)
+                        .thenComparing(LendingResponse::lentTime)
+                        .reversed()
+        );
         return response;
     }
 

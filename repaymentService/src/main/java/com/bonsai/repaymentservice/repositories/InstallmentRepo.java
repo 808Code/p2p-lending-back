@@ -15,6 +15,12 @@ import java.util.UUID;
 @Transactional
 @Repository
 public interface InstallmentRepo extends JpaRepository<Installment, UUID> {
+    @Query(nativeQuery = true, value = """
+            select *
+            from installment i
+            where loan_request = ?1
+            order by scheduled_date desc
+            """)
     List<Installment> findAllByLoanRequest(UUID loanRequestId);
 
     @Query(nativeQuery = true, value = """
@@ -34,8 +40,7 @@ public interface InstallmentRepo extends JpaRepository<Installment, UUID> {
                      INNER JOIN wallet_transaction wt
                                 on int_d.transaction_id = wt.id
             WHERE int_d.lending_id = ?1
-            ORDER BY date DESC ;
-                     
+            ORDER BY date DESC
             """)
     List<Interest> fetchAllByInterestsByLendingId(UUID lendingId);
 
