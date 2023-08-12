@@ -4,6 +4,7 @@ import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.accountservice.repositories.UserNotificationRepo;
+import com.bonsai.loanservice.constants.LoanRequestAmount;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.dto.CreateLendingRequest;
 import com.bonsai.loanservice.dto.LendingRequest;
@@ -244,7 +245,16 @@ public class LendingServiceImpl implements LendingService {
                 .orElseThrow(() -> new AppException("Lender not found", HttpStatus.BAD_REQUEST));
 
         Long amount = loanRepo.getMaximumRemainingLoanRequestAmountByDuration(lender.getId().toString(), duration);
-        return amount == null ? 0L : amount;
+
+        if (amount == null) {
+            return 0L;
+        }
+
+        if(amount > LoanRequestAmount.MAX) {
+            return LoanRequestAmount.MAX;
+        }
+
+        return amount;
     }
 
 }
