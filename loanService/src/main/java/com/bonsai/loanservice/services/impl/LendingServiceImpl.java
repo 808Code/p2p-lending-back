@@ -124,7 +124,7 @@ public class LendingServiceImpl implements LendingService {
             loanRepo.save(loanRequest);
 
             //clear loan suggestion
-            loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
+//            loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
 
             return createLendingRequest.amount();
         }
@@ -142,7 +142,7 @@ public class LendingServiceImpl implements LendingService {
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
 
         //clear loan suggestion
-        loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
+//        loanService.deleteLoanSuggestion(loanRequest.getId(), lenderEmail);
 
         //change the type of transaction from "LOCKED" to "DEBIT" in all the loanCollections
         //also deduct that "DEBIT" amount from lender's wallet
