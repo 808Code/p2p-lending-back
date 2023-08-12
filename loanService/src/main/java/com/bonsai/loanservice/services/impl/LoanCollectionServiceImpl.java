@@ -2,7 +2,9 @@ package com.bonsai.loanservice.services.impl;
 
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
+import com.bonsai.accountservice.models.UserNotification;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
+import com.bonsai.accountservice.repositories.UserNotificationRepo;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.models.LoanCollection;
 import com.bonsai.loanservice.models.LoanRequest;
@@ -10,6 +12,8 @@ import com.bonsai.loanservice.repositories.LendingRepo;
 import com.bonsai.loanservice.repositories.LoanCollectionRepo;
 import com.bonsai.loanservice.repositories.LoanRequestRepo;
 import com.bonsai.loanservice.services.LoanCollectionService;
+import com.bonsai.loanservice.services.NotificationService;
+import com.bonsai.sharedservice.enums.NotificationType;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.Wallet;
@@ -19,7 +23,6 @@ import com.bonsai.walletservice.repositories.WalletTransactionRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +38,8 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
     private final WalletTransactionRepo transactionRepo;
     private final WalletRepo walletRepo;
     private final LendingRepo lendingRepo;
+    private final UserNotificationRepo userNotificationRepo;
+    private final NotificationService notificationService;
 
     @Override
     public Long getLoanCollectionAmount(UUID loanId) {
@@ -110,8 +115,9 @@ public class LoanCollectionServiceImpl implements LoanCollectionService {
                         transaction.getId()
                 );
 
-                walletRepo.saveAndFlush(wallet);
-                transactionRepo.saveAndFlush(transaction);
+                notificationService.saveNotification(wallet.getUser(),NotificationType.LOAN_DISBURSEMENT,
+                        "your Account Has Been Debited by " + transaction.getAmount() + " for loan disbursement of Loan ID "
+                                + loanRequest.getId());
             }
         }
         //set loan status to "FULFILLED"

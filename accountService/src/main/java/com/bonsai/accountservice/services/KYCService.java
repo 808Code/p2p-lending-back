@@ -13,5 +13,7 @@ public interface KYCService {
 
     List<UnverifiedKycResponse> getAllUnverifiedKYC();
 
-    void saveAdminKycMessage(String s,UUID kycId);
+    void saveAdminKycMessage(String s,String email);
+
+    String getAdminKycMessage(String email);
 }

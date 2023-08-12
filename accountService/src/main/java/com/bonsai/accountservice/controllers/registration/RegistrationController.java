@@ -7,6 +7,7 @@ import com.bonsai.accountservice.services.KYCService;
 import com.bonsai.accountservice.dto.request.UserAuth;
 import com.bonsai.accountservice.dto.request.VerifyOTPRequest;
 import com.bonsai.accountservice.dto.request.SendEmailRequest;
+import com.bonsai.accountservice.services.PasswordResetService;
 import com.bonsai.accountservice.services.RegistrationService;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class RegistrationController {
 
     private final RegistrationService registrationService;
     private final KYCService kycService;
+    private final PasswordResetService passwordResetService;
 
     @PostMapping("/sendEmailOTP")
     public ResponseEntity<SuccessResponse> sendEmailOTP(@RequestBody SendEmailRequest request) {
@@ -62,19 +64,19 @@ public class RegistrationController {
         return ResponseEntity.ok(new SuccessResponse("Account Created as a Admin",true));
     }
 
-    @GetMapping("/verifyKYC")
-    public ResponseEntity<SuccessResponse> verifyKYC(@RequestParam String email) {
-        kycService.verifyKYC(email);
+    @PostMapping("/verifyKYC")
+    public ResponseEntity<SuccessResponse> verifyKYC( @RequestBody KYCRequestPojo kycRequestPojo) {
+        kycService.verifyKYC(kycRequestPojo.email());
         return ResponseEntity.ok(
                 new SuccessResponse("KYC verified.", true)
         );
     }
 
     @PostMapping("/getKYC")
-    public ResponseEntity<SuccessResponse> getKYC(@RequestParam String request) {
-        KYC kyc = kycService.getKYC(request);
+    public ResponseEntity<SuccessResponse> getKYC(@RequestBody KYCRequestPojo kycRequestPojo) {
+        KYC kyc = kycService.getKYC(kycRequestPojo.email());
         return ResponseEntity.ok(
-                new SuccessResponse("KYC for " + request, kyc)
+                new SuccessResponse("KYC for " + kycRequestPojo.email(), kyc)
         );
     }
 
@@ -84,13 +86,22 @@ public class RegistrationController {
                 new SuccessResponse("All Unverified KYC", kycService.getAllUnverifiedKYC())
         );
     }
-
     @PostMapping("/admin-kyc-message")
     public ResponseEntity<SuccessResponse> postAdminKycMessage(@RequestBody AdminKycMessageRequest adminKycMessageRequest) {
-        kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.kycId());
+        kycService.saveAdminKycMessage(adminKycMessageRequest.adminKycMessage(), adminKycMessageRequest.email());
         return ResponseEntity.ok(
                 new SuccessResponse("Admin message Posted successfully", null));
     }
+    @GetMapping("/getAdminKycMessage/{email}")
+    public ResponseEntity<SuccessResponse> getAdminKycMessage(@PathVariable("email") String email) {
+        return ResponseEntity.ok(
+                new SuccessResponse("Admin message for " + email, kycService.getAdminKycMessage(email))
+        );
+    }
+
+
+
+
 
 }
 

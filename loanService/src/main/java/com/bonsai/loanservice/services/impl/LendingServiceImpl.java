@@ -1,7 +1,9 @@
 package com.bonsai.loanservice.services.impl;
 
 import com.bonsai.accountservice.constants.Roles;
+import com.bonsai.accountservice.models.UserNotification;
 import com.bonsai.accountservice.models.UserCredential;
+import com.bonsai.accountservice.repositories.UserNotificationRepo;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.dto.LendRequest;
@@ -21,6 +23,7 @@ import com.bonsai.repaymentservice.constants.InstallmentStatus;
 import com.bonsai.repaymentservice.constants.InterestRate;
 import com.bonsai.repaymentservice.dto.InstallmentDto;
 import com.bonsai.repaymentservice.services.InstallmentService;
+import com.bonsai.sharedservice.enums.NotificationType;
 import com.bonsai.sharedservice.exceptions.AppException;
 import com.bonsai.walletservice.constants.WalletTransactionTypes;
 import com.bonsai.walletservice.models.WalletTransaction;
@@ -51,6 +54,7 @@ public class LendingServiceImpl implements LendingService {
     private final InstallmentService installmentService;
     private final LoanCollectionRepo loanCollectionRepo;
     private final LoanService loanService;
+    private final UserNotificationRepo userNotificationRepo;
 
     private final NotificationService notificationService;
 
@@ -111,6 +115,12 @@ public class LendingServiceImpl implements LendingService {
 
         //yes = lender ko wallet lai debit(amount) garne
         UUID transactionId = walletService.debitOrLockAmount(WalletTransactionTypes.DEBIT, BigDecimal.valueOf(lendingAmount), lenderEmail);
+        UserCredential successLender = userRepo.findByEmail(lenderEmail).orElseThrow(() ->new AppException("Invalid borrower email", HttpStatus.BAD_REQUEST));
+
+        notificationService.saveNotification(successLender,NotificationType.LOAN_DISBURSEMENT,
+                "your Account Has Been Debited by " + lendingAmount + " for loan disbursement of Loan ID "
+                + loanRequest.getId());
+
         loanCollectionService.save(loanRequest.getId(), lenderEmail, transactionId);
         //create lending whenever there occurs a "DEBIT" instantly
         createLending(LocalDateTime.now(), lenderEmail, loanRequest.getId(), transactionId);
@@ -128,6 +138,11 @@ public class LendingServiceImpl implements LendingService {
         walletService.loadWallet(BigDecimal.valueOf(newCollectedAmount),
                 loanRequest.getBorrower().getEmail(),
                 "Loan amount credited into wallet");
+
+        notificationService.saveNotification(loanRequest.getBorrower(),NotificationType.LOAN_DISBURSEMENT,
+                "your Account Has Been Credited by " + newCollectedAmount + " for loan disbursement of Loan ID "
+                        + loanRequest.getId());
+
 
         BigDecimal emi = installmentService.calculateMonthlyEMI(loanRequest.getAmount(),loanRequest.getDuration(), InterestRate.BORROWER_INTEREST);
         LocalDate localDateNow=LocalDate.now();

@@ -83,6 +83,15 @@ public class KYC {
 
     @Transient
     private boolean verified;
+
+    @Column(name = "kyc_message",columnDefinition = "TEXT")
+    private String kycMessage;
+    @PrePersist
+    public void setDefaultValues() {
+        if (this.kycMessage == null) {
+            this.kycMessage = "Application Under Review";
+        }
+    }
 }
 
 

@@ -34,14 +34,22 @@ public interface UserCredentialRepo extends JpaRepository<UserCredential, UUID> 
     @Query(nativeQuery = true, value = """
             select *
             from user_credential u
-            where u.kyc_verified = false"""
+            where u.kyc_verified = false
+            """
     )
     List<UserCredential> findAllKycUnverifiedUsers();
     @Modifying
     @Query(nativeQuery = true,value = """
-                update user_credential
-                set kyc_message = ?1
-                where kyc_id = ?2
+              update kyc
+              set kyc_message = ?1
+              where id = ?2
             """)
     void saveAdminKycMessage(String message, UUID kycId);
+
+    @Query(nativeQuery = true,value = """
+               select kyc_message
+               from kyc
+               where id = ?1
+            """)
+    String getAdminKycMessage(UUID email);
 }
