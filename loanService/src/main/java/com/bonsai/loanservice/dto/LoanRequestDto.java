@@ -1,11 +1,12 @@
+
 package com.bonsai.loanservice.dto;
 
-import com.bonsai.loanservice.constants.LoanRequestAmount;
-import com.bonsai.loanservice.models.LoanRequest;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Narendra
@@ -25,18 +26,12 @@ public record LoanRequestDto(
         Integer duration,
 
         @NotEmpty(message = "Loan type can't be empty")
-        String loanType
+        String loanType,
+
+        String supportingDocumentPath,
+        String message,
+        @NotNull(message = "Supporting Document Cannot Be Null")
+        MultipartFile supportingDoc
 ) {
-
-    public LoanRequestDto(LoanRequest loanRequest) {
-        this(loanRequest.getBorrower().getEmail(), loanRequest.getAmount(),
-                loanRequest.getDuration(), loanRequest.getLoanType());
-    }
-
-    public static List<LoanRequestDto> loanToDtoList(List<LoanRequest> loanList) {
-        return loanList.stream().map(
-                loanRequest -> new LoanRequestDto(loanRequest)
-        ).collect(Collectors.toList());
-    }
 
 }

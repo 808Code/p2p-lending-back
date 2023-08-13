@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.math.BigDecimal;
 
 /**
@@ -48,5 +50,11 @@ public class WalletController {
         String user = (String) authentication.getPrincipal();
         return ResponseEntity.ok(new SuccessResponse("Wallet Transaction List fetched successfully",
                 walletService.findAllTransactionsByUserEmail(user)));
+    }
+    @GetMapping("/generateReport")
+    public ResponseEntity<SuccessResponse> generateReport(Authentication authentication, HttpServletResponse response) throws IOException {
+        String user = (String) authentication.getPrincipal();
+        walletService.generateReport(user,response);
+        return ResponseEntity.ok(new SuccessResponse("Wallet Transaction Report fetched successfully", null));
     }
 }

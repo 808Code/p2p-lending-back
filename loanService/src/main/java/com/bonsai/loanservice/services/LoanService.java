@@ -13,7 +13,6 @@ import java.util.UUID;
  */
 public interface LoanService {
     LoanResponse save(LoanRequestDto loanRequestDto);
-    LoanRequestDto findById(UUID id);
 
     List<LoanResponse> findAllByBorrower(String borrowerEmail);
 

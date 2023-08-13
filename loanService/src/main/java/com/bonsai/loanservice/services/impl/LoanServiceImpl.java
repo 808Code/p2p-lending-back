@@ -1,8 +1,12 @@
 package com.bonsai.loanservice.services.impl;
 
+import com.bonsai.accountservice.constants.FileCategory;
 import com.bonsai.accountservice.constants.Roles;
 import com.bonsai.accountservice.models.UserCredential;
 import com.bonsai.accountservice.repositories.UserCredentialRepo;
+import com.bonsai.accountservice.services.StorageNameService;
+import com.bonsai.accountservice.services.StorageService;
+import com.bonsai.accountservice.services.impl.StorageServiceImpl;
 import com.bonsai.loanservice.constants.LoanRequestAmount;
 import com.bonsai.loanservice.constants.LoanStatus;
 import com.bonsai.loanservice.constants.LoanType;
@@ -35,11 +39,13 @@ public class LoanServiceImpl implements LoanService {
     private final LoanRequestRepo loanRequestRepo;
 
     private final UserCredentialRepo userCredentialRepo;
+    private final StorageService storageService;
+    private final StorageNameService StorageNameService;
 
     @Override
     @Transactional
     public LoanResponse save(LoanRequestDto loanRequestDto) {
-
+        String supportingDocumentFilePath = "";
         UserCredential borrower = userCredentialRepo.findByEmailAndRole(loanRequestDto.borrower(), Roles.BORROWER).orElseThrow(
                 () -> new AppException("Borrower not found", HttpStatus.BAD_REQUEST)
         );
@@ -60,6 +66,14 @@ public class LoanServiceImpl implements LoanService {
             throw new AppException("Loan amount must be in the multiples of Rs." + LoanRequestAmount.MIN, HttpStatus.BAD_REQUEST);
         }
 
+        //save the supporting document
+        if (loanRequestDto.supportingDoc() != null) {
+            supportingDocumentFilePath = StorageNameService.storageNameGenerator(loanRequestDto.supportingDoc().getOriginalFilename(),
+                    FileCategory.SUPPORTING_DOCUMENT);
+            storageService.store(loanRequestDto.supportingDoc(),supportingDocumentFilePath);
+        }
+
+
         LoanRequest loanRequest = LoanRequest.builder()
                 .borrower(borrower)
                 .requestedDate(LocalDate.now())
@@ -68,6 +82,8 @@ public class LoanServiceImpl implements LoanService {
                 .remainingAmount(loanRequestDto.amount())
                 .loanType(loanRequestDto.loanType())
                 .loanStatus(LoanStatus.NEW)
+                .supportingDocumentPath(supportingDocumentFilePath)
+                .loanRequestReason(loanRequestDto.message())
                 .build();
 
         borrower.setOngoingLoan(true);
@@ -76,12 +92,6 @@ public class LoanServiceImpl implements LoanService {
         loanRequest = loanRequestRepo.saveAndFlush(loanRequest);
 
         return new LoanResponse(loanRequest);
-    }
-
-    @Override
-    public LoanRequestDto findById(UUID id) {
-        LoanRequest loanRequest = loanRequestRepo.findById(id).orElseThrow(() -> new AppException("Loan not found", HttpStatus.BAD_REQUEST));
-        return new LoanRequestDto(loanRequest);
     }
 
     @Override

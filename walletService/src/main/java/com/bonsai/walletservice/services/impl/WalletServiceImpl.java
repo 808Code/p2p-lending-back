@@ -11,15 +11,24 @@ import com.bonsai.walletservice.repositories.WalletTransactionRepo;
 import com.bonsai.walletservice.services.WalletService;
 import com.bonsai.sharedservice.exceptions.AppException;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Narendra
@@ -130,6 +139,55 @@ public class WalletServiceImpl implements WalletService {
     public Boolean isBalanceSufficient(String userEmail, BigDecimal amount) {
         BigDecimal availableBalance = fetchBalanceFromWallet(userEmail).get("availableBalance");
         return ((availableBalance.compareTo(amount) > 0) || (availableBalance.compareTo(amount)==0));
+    }
+
+    @Override
+    public void generateReport(String user,HttpServletResponse response) throws IOException {
+        List<Map<String, Object>> borrowerTranReport = walletTransactionRepo.getBorrowerTranReport(user);
+        export(borrowerTranReport, "report sheet", response);
+    }
+
+    public static void export(List<Map<String, Object>> list, String sheetName, HttpServletResponse response) throws IOException {
+        if (list.isEmpty())
+            throw new RuntimeException("Data Empty");
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(sheetName);
+        int rowCount = 0;
+        int headerCount = 0;
+        Row r = sheet.createRow(rowCount);
+        List<String> sortedKeyList = list.get(0).keySet().stream().sorted().collect(Collectors.toList());
+        for (String m : sortedKeyList) {
+//            if (!m.equals("color")) {
+            r.createCell(headerCount).setCellValue(m);
+            headerCount++;
+//            }
+        }
+        for (Map<String, Object> aBook : list) {
+            Row row = sheet.createRow(++rowCount);
+            int columnCount = 0;
+            int count = 0;
+            for (Map.Entry<String, Object> m : aBook.entrySet()) {
+                Cell cell = row.createCell(columnCount);
+//                if (!sortedKeyList.get(count).equals("color")) {
+                cell.setCellValue(String.valueOf(aBook.get(sortedKeyList.get(count))));
+                if (aBook.get("color") != null) {
+                    XSSFCellStyle cellStyle = workbook.createCellStyle();
+                    cellStyle.setFillForegroundColor(IndexedColors.valueOf(aBook.get("color").toString()).getIndex());
+                    cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    cellStyle.setBorderBottom(BorderStyle.THICK);
+                    cell.setCellStyle(cellStyle);
+                }
+
+                columnCount++;
+                count++;
+//                }
+            }
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + sheetName);
+        ServletOutputStream outStream = response.getOutputStream();
+        workbook.write(outStream); // Write workbook to response.
+        outStream.close();
     }
 
 }

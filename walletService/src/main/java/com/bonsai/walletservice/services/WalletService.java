@@ -4,6 +4,8 @@ import com.bonsai.walletservice.dtos.LoadWalletDto;
 import com.bonsai.walletservice.models.Wallet;
 import com.bonsai.walletservice.models.WalletTransaction;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -21,4 +23,6 @@ public interface WalletService {
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
     UUID debitOrLockAmount(String transactionType, BigDecimal amount, String userEmail);
     Boolean isBalanceSufficient(String user, BigDecimal amount);
+
+    void generateReport(String user, HttpServletResponse response) throws IOException;
 }
