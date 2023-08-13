@@ -97,7 +97,7 @@ public class LoanSuggestionServiceImpl implements LoanSuggestionService {
         }
 
         //once the loan is suggested to lenders change its suggestion status to suggested and save it into database
-        loanRequest.setLoanStatus(LoanStatus.SUGGESTED);
+//        loanRequest.setLoanStatus(LoanStatus.SUGGESTED);
         loanRequestRepo.save(loanRequest);
     }
 

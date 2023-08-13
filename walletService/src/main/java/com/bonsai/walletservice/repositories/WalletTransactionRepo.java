@@ -24,7 +24,10 @@ public interface WalletTransactionRepo extends JpaRepository<WalletTransaction, 
             from wallet_transaction w
                      inner join wallet w2 on w.wallet_id = w2.id
                      inner join user_credential uc on w2.user_id = uc.id
-                and uc.email = ?1 order by date desc""")
+                and uc.email = ?1
+            order by w.date desc""")
+
+   
     List<Map<String, Object>> findAllTransactionsByUserEmail(String email);
 
     @Query(nativeQuery = true, value = """

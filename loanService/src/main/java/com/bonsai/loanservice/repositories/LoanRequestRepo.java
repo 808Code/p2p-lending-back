@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -36,4 +37,37 @@ public interface LoanRequestRepo extends JpaRepository<LoanRequest, UUID> {
                                limit 1)
             """)
     void clearLoanSuggestion(UUID loanId, String lenderEmail);
+
+    @Query(nativeQuery = true, value = """
+            select lr.*
+            from loan_request lr
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where (lc.lender_id <> ?1 or lc.lender_id is null)
+              and lr.duration = ?2
+              and lr.remaining_amount >= ?3
+              and lr.loan_status = 'NEW'
+            order by lr.requested_date asc
+            limit 1
+                   """)
+    Optional<LoanRequest> findLendableLoanRequest(UUID lenderId, Integer duration, Long remainingAmount);
+
+    @Query(nativeQuery = true, value = """
+            select distinct lr.duration
+            from loan_request lr
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where lr.loan_status = 'NEW'
+              and (lc.lender_id <> ?1 or lc.lender_id is null)
+            order by lr.duration asc
+                                    """)
+    List<Integer> getAvailableLendingDurationList(UUID lenderId);
+
+    @Query(nativeQuery = true, value = """
+            select max(lr.remaining_amount)
+            from loan_request lr
+                     left join loan_collection lc on lr.id = lc.loan_id
+            where (lc.lender_id <> ?1 or lc.lender_id is null)
+              and lr.duration = ?2
+              and lr.loan_status = 'NEW'
+                        """)
+    Long getMaximumRemainingLoanRequestAmountByDuration(UUID lenderId, Integer duration);
 }

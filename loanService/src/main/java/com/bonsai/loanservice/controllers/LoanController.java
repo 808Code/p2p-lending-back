@@ -1,12 +1,12 @@
 package com.bonsai.loanservice.controllers;
 
-import com.bonsai.loanservice.dto.LendRequest;
+import com.bonsai.loanservice.dto.LendingRequest;
+import com.bonsai.loanservice.dto.LoanRequestDto;
 import com.bonsai.loanservice.dto.LoanResponse;
 import com.bonsai.loanservice.services.LendingService;
+import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.dtos.loan.LoanInQueue;
 import com.bonsai.sharedservice.dtos.response.SuccessResponse;
-import com.bonsai.loanservice.dto.LoanRequestDto;
-import com.bonsai.loanservice.services.LoanService;
 import com.bonsai.sharedservice.rmq.MessagingConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -61,10 +61,26 @@ public class LoanController {
     }
 
     @PostMapping("/lend")
-    public ResponseEntity<SuccessResponse> lend(@Valid @RequestBody LendRequest lendRequest, Authentication authentication) {
+    public ResponseEntity<SuccessResponse> lend(@Valid @RequestBody LendingRequest lendingRequest, Authentication authentication) {
         String user = (String) authentication.getPrincipal();
         return ResponseEntity.ok(
-                new SuccessResponse("Amount lending successful", lendingService.lend(lendRequest, user))
+                new SuccessResponse("Amount lending successful", lendingService.createLending(lendingRequest, user))
+        );
+    }
+
+    @GetMapping("/getAvailableLendingDurationList")
+    public ResponseEntity<SuccessResponse> getAvailableLendingDuration(Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(
+                new SuccessResponse("Available lending duration list fetched successfully", lendingService.getAvailableLendingDurationList(user))
+        );
+    }
+
+    @GetMapping("/getMaximumLendingAmount")
+    public ResponseEntity<SuccessResponse> getMaximumLendingAmount(@RequestParam(value = "duration") Integer duration, Authentication authentication) {
+        String user = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(
+                new SuccessResponse("Maximum Lending Amount fetched successfully", lendingService.getMaximumLendingAmount(user, duration))
         );
     }
 }
