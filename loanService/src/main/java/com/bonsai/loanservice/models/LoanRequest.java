@@ -44,4 +44,9 @@ public class LoanRequest {
 
     @Column(name = "remaining_amount")
     private Long remainingAmount;
+
+    @Column(name = "supporting_document")
+    private String supportingDocumentPath;
+    @Column(name = "loan_request_reason", columnDefinition = "TEXT")
+    private String loanRequestReason;
 }

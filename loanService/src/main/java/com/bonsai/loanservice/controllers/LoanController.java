@@ -32,7 +32,7 @@ public class LoanController {
     private final LendingService lendingService;
 
     @PostMapping("/createLoan")
-    public ResponseEntity<SuccessResponse> createLoan(@Valid @RequestBody LoanRequestDto loanRequestDto) {
+    public ResponseEntity<SuccessResponse> createLoan(@Valid @ModelAttribute LoanRequestDto loanRequestDto) {
         //save the loan request to database
         LoanResponse loanResponse = loanService.save(loanRequestDto);
 
